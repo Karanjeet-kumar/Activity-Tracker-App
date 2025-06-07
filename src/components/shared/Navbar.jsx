@@ -3,15 +3,44 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { Avatar } from "../ui/avatar";
 import { CircleUserRound, LogOut, User2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import logo from "@/assets/react.svg";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
+import { setLoggedUser } from "../redux/authSlice";
+import axios from "axios";
+import { LOGOUT_API } from "../utils/api_const";
 import { useNav } from "../context/NavContext";
 
 const Navbar = () => {
   const { toggleNav } = useNav(); // Get toggle function from context
   const { loggedUser } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
+
+  const logoutHandler = async () => {
+    const refreshToken = localStorage.getItem("refresh_token");
+
+    // API(LOGOUT_API)--->Connected
+    try {
+      const res = await axios.post(LOGOUT_API, { refresh_token: refreshToken });
+
+      if (res.data.success) {
+        dispatch(setLoggedUser(null));
+        navigate("/login");
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response?.data?.message || "Logout failed");
+    } finally {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+    }
+  };
+
   return (
     <div className="bg-gradient-to-r from-blue-500 to-blue-900 text-white">
       <div className="flex items-center justify-between mx-4 max-w-7xl h-16">
@@ -78,7 +107,7 @@ const Navbar = () => {
                     <div className="flex w-fit items-center ">
                       <LogOut />
                       <Button
-                        // onClick={logoutHandler}
+                        onClick={logoutHandler}
                         variant="link"
                         className="cursor-pointer"
                       >
