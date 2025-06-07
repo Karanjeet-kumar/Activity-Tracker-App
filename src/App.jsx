@@ -22,7 +22,6 @@ const appRouter = createBrowserRouter([
     element: <DashBoard />,
   },
 ]);
-s;
 
 function App() {
   return (
