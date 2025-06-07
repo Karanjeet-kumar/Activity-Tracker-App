@@ -5,15 +5,20 @@ import { Avatar } from "../ui/avatar";
 import { CircleUserRound, LogOut, User2 } from "lucide-react";
 import logo from "@/assets/react.svg";
 import { useSelector } from "react-redux";
+import { useNav } from "../context/NavContext";
 
 const Navbar = () => {
+  const { toggleNav } = useNav(); // Get toggle function from context
   const { loggedUser } = useSelector((store) => store.auth);
 
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   return (
     <div className="bg-gradient-to-r from-blue-500 to-blue-900 text-white">
       <div className="flex items-center justify-between mx-4 max-w-7xl h-16">
-        <div className="flex items-center gap-3 cursor-pointer">
+        <div
+          className="flex items-center gap-3 cursor-pointer"
+          onClick={toggleNav}
+        >
           <img
             src={logo}
             alt="logo"

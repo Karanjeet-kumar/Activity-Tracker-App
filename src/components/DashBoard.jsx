@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Navbar from "./shared/Navbar";
+import Nav from "./shared/Nav";
 import {
   CalendarClock,
   CircleAlert,
@@ -46,6 +47,7 @@ function Dashboard() {
     <div>
       <Navbar />
       <div className="flex h-screen">
+        <Nav />
         {/* Main Content */}
         <div className="flex-1 overflow-auto p-6">
           <div className="flex items-center gap-2 mb-8">
