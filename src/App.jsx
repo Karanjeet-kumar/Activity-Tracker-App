@@ -5,6 +5,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Login from "./components/auth/Login";
+import DashBoard from "./components/DashBoard";
 
 const appRouter = createBrowserRouter([
   // Client Side
@@ -16,7 +17,12 @@ const appRouter = createBrowserRouter([
     path: "/login",
     element: <Login />,
   },
+  {
+    path: "/dashboard",
+    element: <DashBoard />,
+  },
 ]);
+s;
 
 function App() {
   return (
