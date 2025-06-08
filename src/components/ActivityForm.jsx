@@ -20,11 +20,17 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { SquarePen, ArrowLeft, X, CirclePlus } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useGetAllCategories } from "./hooks/useGetAllCategories";
+import { setAllCategories, setSelectedCategory } from "./redux/formSlice";
 
 function ActivityForm() {
+  const { allCategories, selectedCategory } = useSelector(
+    (store) => store.form
+  );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [step, setStep] = useState("category");
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedActivity, setSelectedActivity] = useState("");
   const [customActivityName, setCustomActivityName] = useState("");
   const [assignedUser, setAssignedUser] = useState(null);
@@ -35,11 +41,19 @@ function ActivityForm() {
   const [deptFilter, setDeptFilter] = useState("");
   const [verifierSearch, setVerifierSearch] = useState("");
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleCategory = async () => {
+    await useGetAllCategories(dispatch, navigate);
+  };
+
   // Reset state when dialog closes
   useEffect(() => {
     if (!isDialogOpen) {
       setStep("category");
-      setSelectedCategory("");
+      dispatch(setAllCategories([]));
+      dispatch(setSelectedCategory(""));
       setSelectedActivity("");
       setCustomActivityName("");
       setAssignedUser(null);
@@ -51,30 +65,6 @@ function ActivityForm() {
       setVerifierSearch("");
     }
   }, [isDialogOpen]);
-
-  // Sample data for UI demonstration
-  const categories = [
-    {
-      id: "project",
-      name: "Project Management",
-      description: "Activities related to project planning, execution...",
-    },
-    {
-      id: "development",
-      name: "Development",
-      description: "Activities related to software development and coding",
-    },
-    {
-      id: "design",
-      name: "Design",
-      description: "Activities related to UI/UX and graphic design",
-    },
-    {
-      id: "marketing",
-      name: "Marketing",
-      description: "Activities related to marketing campaigns...",
-    },
-  ];
 
   const designActivities = [
     {
@@ -125,7 +115,10 @@ function ActivityForm() {
     <div>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogTrigger asChild>
-          <Button className="bg-blue-600 hover:bg-blue-500 cursor-pointer">
+          <Button
+            onClick={handleCategory}
+            className="bg-blue-600 hover:bg-blue-500 cursor-pointer"
+          >
             <SquarePen className="mr-2 h-4 w-4" />
             Create Activity
           </Button>
@@ -163,24 +156,24 @@ function ActivityForm() {
             <div className="space-y-2">
               <h3 className="text-lg font-medium">Select Category</h3>
               <div className="grid grid-cols-2 gap-4">
-                {categories.map((category) => (
+                {allCategories.map((category) => (
                   <Card
-                    key={category.id}
+                    key={category.category_id}
                     className={`cursor-pointer transition-colors ${
-                      selectedCategory === category.id
+                      selectedCategory?.category_id === category.category_id
                         ? "border-blue-500 bg-blue-100"
                         : "hover:border-blue-500 hover:bg-blue-50"
                     }`}
                     onClick={() => {
-                      setSelectedCategory(category.id);
+                      dispatch(setSelectedCategory(category));
                       setStep("activity");
                     }}
                   >
                     <CardContent className="p-4">
-                      <h3 className="font-medium">{category.name}</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <h3 className="font-medium">{category.category_name}</h3>
+                      {/* <p className="text-sm text-muted-foreground">
                         {category.description}
-                      </p>
+                      </p> */}
                     </CardContent>
                   </Card>
                 ))}
