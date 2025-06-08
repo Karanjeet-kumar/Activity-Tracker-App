@@ -18,6 +18,7 @@ const useGetAllAssignedActivities = () => {
     let retried = false;
 
     const fetchActivities = async () => {
+      // API(GetAllAssigned_ACTIVITY_API)--->Connected
       try {
         const accessToken = localStorage.getItem("access_token");
 
