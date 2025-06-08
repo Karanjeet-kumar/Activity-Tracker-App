@@ -30,9 +30,17 @@ import {
   setSelectedActivity,
   setAllUsers,
   setAssignedUser,
+  setAllVerifiers,
+  setAssignedVerifier,
+  setTargetDate,
+  setNotes,
 } from "./redux/formSlice";
-import { ACTIVITY_API_END_POINT, USER_API_END_POINT } from "./utils/api_const";
 import axios from "axios";
+import {
+  ACTIVITY_API_END_POINT,
+  USER_API_END_POINT,
+  VERIFIER_API_END_POINT,
+} from "./utils/api_const";
 
 function ActivityForm() {
   const { loggedUser } = useSelector((store) => store.auth);
@@ -43,14 +51,15 @@ function ActivityForm() {
     selectedActivity,
     allUsers,
     assignedUser,
+    allVerifiers,
+    assignedVerifier,
+    targetDate,
+    notes,
   } = useSelector((store) => store.form);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [step, setStep] = useState("category");
   const [customActivityName, setCustomActivityName] = useState("");
   const [customActivityDesc, setCustomActivityDesc] = useState("");
-  const [verifier, setVerifier] = useState(null);
-  const [targetDate, setTargetDate] = useState("");
-  const [notes, setNotes] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [deptFilter, setDeptFilter] = useState("");
   const [verifierSearch, setVerifierSearch] = useState("");
@@ -79,6 +88,7 @@ function ActivityForm() {
     userRole,
     departmentName
   ) => {
+    // API(USERS_API)--->Connected
     try {
       const params = new URLSearchParams();
 
@@ -95,6 +105,18 @@ function ActivityForm() {
     }
   };
 
+  const handleVerifiers = async (locationId) => {
+    // API(VERIFIERS_API)--->Connected
+    try {
+      const response = await axios.get(
+        `${VERIFIER_API_END_POINT}/${locationId}/`
+      );
+      dispatch(setAllVerifiers(response.data.verifiers));
+    } catch (error) {
+      console.error("Failed to fetch verifiers", error);
+    }
+  };
+
   // Reset state when dialog closes
   useEffect(() => {
     if (!isDialogOpen) {
@@ -107,9 +129,10 @@ function ActivityForm() {
       setCustomActivityDesc("");
       dispatch(setAllUsers([]));
       dispatch(setAssignedUser(""));
-      setVerifier(null);
-      setTargetDate("");
-      setNotes("");
+      dispatch(setAllVerifiers([]));
+      dispatch(setAssignedVerifier(""));
+      dispatch(setTargetDate(""));
+      dispatch(setNotes(""));
       setSearchTerm("");
       setDeptFilter("");
       setVerifierSearch("");
@@ -127,24 +150,6 @@ function ActivityForm() {
   const departments = ["Engineering", "Marketing", "HR", "Finance"];
 
   const handleCreateActivity = () => setIsDialogOpen(false);
-
-  // Placeholder user data for UI
-  const placeholderUsers = [
-    {
-      id: "1",
-      name: "Jane Doe",
-      email: "jane@example.com",
-      role: "USER",
-      department: "Engineering",
-    },
-    {
-      id: "2",
-      name: "Michael Brown",
-      email: "michael@example.com",
-      role: "HOD",
-      department: "Marketing",
-    },
-  ];
 
   return (
     <div>
@@ -354,6 +359,7 @@ function ActivityForm() {
                     }`}
                     onClick={() => {
                       dispatch(setAssignedUser(user));
+                      handleVerifiers(`${loggedUser.locationId}`);
                       setStep("summary");
                     }}
                   >
@@ -384,29 +390,41 @@ function ActivityForm() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="font-medium">Category</p>
-                    <p className="text-sm text-muted-foreground">Design</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedCategory.category_name}
+                    </p>
                   </div>
 
                   <div>
                     <p className="font-medium">Assigned To</p>
-                    <p className="text-sm text-muted-foreground">Jane Doe</p>
+                    <p className="text-sm text-muted-foreground">
+                      {assignedUser.user_name}
+                    </p>
                   </div>
 
                   <div>
                     <p className="font-medium">Activity</p>
-                    <p className="text-sm text-muted-foreground">UI Design</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedActivity.activity_name}
+                    </p>
                   </div>
 
                   <div>
                     <p className="font-medium">Assigned By</p>
-                    <p className="text-sm text-muted-foreground">John Admin</p>
+                    <p className="text-sm text-muted-foreground">
+                      {loggedUser.user_name}
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Select Verifier</h3>
-
+                <div className="flex gap-8 items-center">
+                  <h3 className="text-lg font-medium">Select Verifier</h3>
+                  <p className="text-base text-muted-foreground">
+                    {assignedVerifier.user_name}
+                  </p>
+                </div>
                 <div className="space-y-2">
                   <Input
                     placeholder="Search verifiers..."
@@ -414,28 +432,27 @@ function ActivityForm() {
                     onChange={(e) => setVerifierSearch(e.target.value)}
                   />
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[200px] overflow-y-auto">
-                  {placeholderUsers.map((user) => (
+                  {allVerifiers.map((verifier) => (
                     <div
-                      key={user.id}
+                      key={verifier.user_id}
                       className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                        verifier?.id === user.id
+                        assignedVerifier?.user_id === verifier.user_id
                           ? "border-blue-500 bg-blue-100"
                           : "hover:border-blue-500 hover:bg-blue-50"
                       }`}
-                      onClick={() => setVerifier(user)}
+                      onClick={() => dispatch(setAssignedVerifier(verifier))}
                     >
-                      <div className="font-medium">{user.name}</div>
+                      <div className="font-medium">{verifier.user_name}</div>
                       <div className="text-sm text-muted-foreground truncate overflow-hidden whitespace-nowrap">
-                        {user.email}
+                        {verifier.email_id}
                       </div>
                       <div className="flex gap-2 mt-2 text-xs">
                         <span className="bg-green-300 px-2 py-1 rounded">
-                          {user.role}
+                          {verifier.user_role}
                         </span>
                         <span className="bg-cyan-300 px-2 py-1 rounded">
-                          {user.department}
+                          {verifier.department_name}
                         </span>
                       </div>
                     </div>
@@ -449,7 +466,7 @@ function ActivityForm() {
                   <Input
                     type="date"
                     value={targetDate}
-                    onChange={(e) => setTargetDate(e.target.value)}
+                    onChange={(e) => dispatch(setTargetDate(e.target.value))}
                     min={new Date().toISOString().split("T")[0]}
                   />
                 </div>
@@ -457,9 +474,9 @@ function ActivityForm() {
                 <div className="space-y-2">
                   <Label>Additional Notes (Optional)</Label>
                   <Textarea
-                    placeholder="Add any specific instructions or context for this Activity..."
+                    placeholder="Add any specific instructions or context for this activity..."
                     value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
+                    onChange={(e) => dispatch(setNotes(e.target.value))}
                     rows={3}
                   />
                 </div>
