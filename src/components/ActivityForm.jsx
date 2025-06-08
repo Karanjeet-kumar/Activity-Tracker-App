@@ -38,9 +38,11 @@ import {
 import axios from "axios";
 import {
   ACTIVITY_API_END_POINT,
+  ADD_ACTIVITY_API,
   USER_API_END_POINT,
   VERIFIER_API_END_POINT,
 } from "./utils/api_const";
+import { toast } from "sonner";
 
 function ActivityForm() {
   const { loggedUser } = useSelector((store) => store.auth);
@@ -149,7 +151,40 @@ function ActivityForm() {
 
   const departments = ["Engineering", "Marketing", "HR", "Finance"];
 
-  const handleCreateActivity = () => setIsDialogOpen(false);
+  const handleCreateActivity = async (formData) => {
+    // API(ADD_ACTIVITY_API)--->Connected
+    try {
+      const res = await axios.post(`${ADD_ACTIVITY_API}`, formData);
+
+      if (res.data.success) {
+        toast.success("Activity Assigned Successfully.");
+      } else {
+        toast.error("Activity Creation Failed");
+      }
+    } catch (error) {
+      toast.error("Activity Creation Failed");
+    } finally {
+      setIsDialogOpen(false);
+    }
+  };
+
+  const formData = {
+    category: selectedCategory.category_id,
+    ActivityName: selectedActivity.activity_name,
+    assign_to: assignedUser.user_id,
+    AssignedUserRole: assignedUser.user_role,
+    verifier: assignedVerifier.user_id,
+    TargetDate: targetDate,
+    created_by: loggedUser.user_id,
+    CreatedOn: new Date(
+      new Date().getTime() - new Date().getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .slice(0, -1),
+    status: 1,
+    department: assignedUser.department_id,
+    AdditionalNote: notes,
+  };
 
   return (
     <div>
@@ -492,7 +527,7 @@ function ActivityForm() {
                 </Button>
                 <Button
                   className="bg-blue-600 hover:bg-blue-500 cursor-pointer"
-                  onClick={handleCreateActivity}
+                  onClick={() => handleCreateActivity(formData)}
                 >
                   Assign Activity
                 </Button>

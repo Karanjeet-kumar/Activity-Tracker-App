@@ -6,3 +6,4 @@ export const ACTIVITY_API_END_POINT =
   "http://127.0.0.1:8000/api/get/activities";
 export const USER_API_END_POINT = "http://127.0.0.1:8000/api/get/users";
 export const VERIFIER_API_END_POINT = "http://127.0.0.1:8000/api/get/verifiers";
+export const ADD_ACTIVITY_API = "http://127.0.0.1:8000/api/add/trnActivity/";
