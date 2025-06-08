@@ -5,6 +5,7 @@ import Nav from "./shared/Nav";
 import { ClipboardList, Search } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Button } from "./ui/button";
+import ActivityForm from "./ActivityForm";
 
 function ActivityPage() {
   const { loggedUser } = useSelector((store) => store.auth);
@@ -35,7 +36,7 @@ function ActivityPage() {
             </div>
             {!!loggedUser?.isAdmin && (
               <div>
-                <Button>Create Activity</Button>
+                <ActivityForm />
               </div>
             )}
           </div>
