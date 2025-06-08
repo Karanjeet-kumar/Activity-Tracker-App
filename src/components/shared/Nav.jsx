@@ -2,13 +2,15 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
-import { LayoutDashboard } from "lucide-react";
+import { ClipboardList, LayoutDashboard } from "lucide-react";
 import { useNav } from "../context/NavContext";
+import { useSelector } from "react-redux";
 
 function Nav() {
   const location = useLocation();
   const [activeNav, setActiveNav] = useState(location.pathname);
   const { isNavVisible } = useNav(); // Get visibility state
+  const { loggedUser } = useSelector((store) => store.auth);
 
   useEffect(() => {
     setActiveNav(location.pathname);
@@ -26,6 +28,16 @@ function Nav() {
             >
               <LayoutDashboard />
               Dashboard
+            </Button>
+          </Link>
+
+          <Link to="/activities">
+            <Button
+              variant={activeNav === "/activities" ? "default" : "ghost"}
+              className="w-full justify-start cursor-pointer"
+            >
+              <ClipboardList />
+              {loggedUser?.isAdmin ? "Activities" : "My Activities"}
             </Button>
           </Link>
         </div>
