@@ -28,18 +28,26 @@ import {
   setSelectedCategory,
   setAllActivities,
   setSelectedActivity,
+  setAllUsers,
+  setAssignedUser,
 } from "./redux/formSlice";
-import { ACTIVITY_API_END_POINT } from "./utils/api_const";
+import { ACTIVITY_API_END_POINT, USER_API_END_POINT } from "./utils/api_const";
 import axios from "axios";
 
 function ActivityForm() {
-  const { allCategories, selectedCategory, allActivities, selectedActivity } =
-    useSelector((store) => store.form);
+  const { loggedUser } = useSelector((store) => store.auth);
+  const {
+    allCategories,
+    selectedCategory,
+    allActivities,
+    selectedActivity,
+    allUsers,
+    assignedUser,
+  } = useSelector((store) => store.form);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [step, setStep] = useState("category");
   const [customActivityName, setCustomActivityName] = useState("");
   const [customActivityDesc, setCustomActivityDesc] = useState("");
-  const [assignedUser, setAssignedUser] = useState(null);
   const [verifier, setVerifier] = useState(null);
   const [targetDate, setTargetDate] = useState("");
   const [notes, setNotes] = useState("");
@@ -65,6 +73,28 @@ function ActivityForm() {
     }
   };
 
+  const handleUsers = async (
+    locationId,
+    userName,
+    userRole,
+    departmentName
+  ) => {
+    try {
+      const params = new URLSearchParams();
+
+      if (userName) params.append("user_name", userName); // matches user_name
+      if (userRole) params.append("user_role", userRole); // "HOD" or "EMPLOYEE"
+      if (departmentName) params.append("department_name", departmentName); // partial match
+
+      const response = await axios.get(
+        `${USER_API_END_POINT}/${locationId}/?${params.toString()}`
+      );
+      dispatch(setAllUsers(response.data.users)); // assuming your API returns user list directly (not inside `users`)
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    }
+  };
+
   // Reset state when dialog closes
   useEffect(() => {
     if (!isDialogOpen) {
@@ -75,7 +105,8 @@ function ActivityForm() {
       dispatch(setSelectedActivity(""));
       setCustomActivityName("");
       setCustomActivityDesc("");
-      setAssignedUser(null);
+      dispatch(setAllUsers([]));
+      dispatch(setAssignedUser(""));
       setVerifier(null);
       setTargetDate("");
       setNotes("");
@@ -84,6 +115,14 @@ function ActivityForm() {
       setVerifierSearch("");
     }
   }, [isDialogOpen]);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      handleUsers(`${loggedUser.locationId}`, searchTerm, deptFilter);
+    }, 500); // debounce to avoid too many API calls
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, deptFilter]);
 
   const departments = ["Engineering", "Marketing", "HR", "Finance"];
 
@@ -203,6 +242,7 @@ function ActivityForm() {
                     }`}
                     onClick={() => {
                       dispatch(setSelectedActivity(activity));
+                      handleUsers(`${loggedUser.locationId}`);
                       setStep("user");
                     }}
                   >
@@ -259,6 +299,7 @@ function ActivityForm() {
                           activity_desc: customActivityDesc,
                         })
                       );
+                      handleUsers(`${loggedUser.locationId}`);
                       setStep("user");
                     }}
                     className="bg-blue-600 hover:bg-blue-500 cursor-pointer"
@@ -279,7 +320,9 @@ function ActivityForm() {
                   <Input
                     placeholder="Search by name or email..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
@@ -301,29 +344,29 @@ function ActivityForm() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
-                {placeholderUsers.map((user) => (
+                {allUsers.map((user) => (
                   <div
-                    key={user.id}
+                    key={user.user_id}
                     className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                      assignedUser?.id === user.id
+                      assignedUser?.user_id === user.user_id
                         ? "border-blue-500 bg-blue-100"
                         : "hover:border-blue-500 hover:bg-blue-50"
                     }`}
                     onClick={() => {
-                      setAssignedUser(user);
+                      dispatch(setAssignedUser(user));
                       setStep("summary");
                     }}
                   >
-                    <div className="font-medium">{user.name}</div>
+                    <div className="font-medium">{user.user_name}</div>
                     <div className="text-sm text-muted-foreground truncate overflow-hidden whitespace-nowrap">
-                      {user.email}
+                      {user.email_id}
                     </div>
                     <div className="flex gap-2 mt-2 text-xs">
                       <span className="bg-green-300 px-2 py-1 rounded">
-                        {user.role}
+                        {user.user_role}
                       </span>
                       <span className="bg-cyan-300 px-2 py-1 rounded">
-                        {user.department}
+                        {user.department_name}
                       </span>
                     </div>
                   </div>
