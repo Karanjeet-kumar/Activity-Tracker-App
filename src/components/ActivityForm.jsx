@@ -23,16 +23,22 @@ import { SquarePen, ArrowLeft, X, CirclePlus } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useGetAllCategories } from "./hooks/useGetAllCategories";
-import { setAllCategories, setSelectedCategory } from "./redux/formSlice";
+import {
+  setAllCategories,
+  setSelectedCategory,
+  setAllActivities,
+  setSelectedActivity,
+} from "./redux/formSlice";
+import { ACTIVITY_API_END_POINT } from "./utils/api_const";
+import axios from "axios";
 
 function ActivityForm() {
-  const { allCategories, selectedCategory } = useSelector(
-    (store) => store.form
-  );
+  const { allCategories, selectedCategory, allActivities, selectedActivity } =
+    useSelector((store) => store.form);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [step, setStep] = useState("category");
-  const [selectedActivity, setSelectedActivity] = useState("");
   const [customActivityName, setCustomActivityName] = useState("");
+  const [customActivityDesc, setCustomActivityDesc] = useState("");
   const [assignedUser, setAssignedUser] = useState(null);
   const [verifier, setVerifier] = useState(null);
   const [targetDate, setTargetDate] = useState("");
@@ -40,12 +46,23 @@ function ActivityForm() {
   const [searchTerm, setSearchTerm] = useState("");
   const [deptFilter, setDeptFilter] = useState("");
   const [verifierSearch, setVerifierSearch] = useState("");
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleCategory = async () => {
     await useGetAllCategories(dispatch, navigate);
+  };
+
+  const handleActivity = async (categoryId) => {
+    // API(ACTIVITY_API)--->Connected
+    try {
+      const response = await axios.get(
+        `${ACTIVITY_API_END_POINT}/${categoryId}/`
+      );
+      dispatch(setAllActivities(response.data.activities));
+    } catch (error) {
+      console.error("Failed to fetch activities", error);
+    }
   };
 
   // Reset state when dialog closes
@@ -54,8 +71,10 @@ function ActivityForm() {
       setStep("category");
       dispatch(setAllCategories([]));
       dispatch(setSelectedCategory(""));
-      setSelectedActivity("");
+      dispatch(setAllActivities([]));
+      dispatch(setSelectedActivity(""));
       setCustomActivityName("");
+      setCustomActivityDesc("");
       setAssignedUser(null);
       setVerifier(null);
       setTargetDate("");
@@ -66,31 +85,8 @@ function ActivityForm() {
     }
   }, [isDialogOpen]);
 
-  const designActivities = [
-    {
-      id: "wireframing",
-      name: "Wireframing",
-      description: "Create wireframes for new features",
-    },
-    {
-      id: "userTesting",
-      name: "User Testing",
-      description: "Conduct user testing sessions",
-    },
-    {
-      id: "uiDesign",
-      name: "UI Design",
-      description: "Design user interface elements",
-    },
-  ];
-
   const departments = ["Engineering", "Marketing", "HR", "Finance"];
 
-  // Placeholder functions for UI demonstration
-  const getCategoryName = (id) =>
-    categories.find((cat) => cat.id === id)?.name || "";
-  const getActivityName = (id) =>
-    designActivities.find((act) => act.id === id)?.name || customActivityName;
   const handleCreateActivity = () => setIsDialogOpen(false);
 
   // Placeholder user data for UI
@@ -166,6 +162,7 @@ function ActivityForm() {
                     }`}
                     onClick={() => {
                       dispatch(setSelectedCategory(category));
+                      handleActivity(category.category_id);
                       setStep("activity");
                     }}
                   >
@@ -194,24 +191,25 @@ function ActivityForm() {
                   Add Custom Activity
                 </Button>
               </div>
+
               <div className="space-y-3">
-                {designActivities.map((activity) => (
+                {allActivities.map((activity) => (
                   <div
-                    key={activity.id}
+                    key={activity.sa_id}
                     className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                      selectedActivity === activity.id
+                      selectedActivity?.sa_id === activity.sa_id
                         ? "border-blue-500 bg-blue-100"
                         : "hover:border-blue-500 hover:bg-blue-50"
                     }`}
                     onClick={() => {
-                      setSelectedActivity(activity.id);
+                      dispatch(setSelectedActivity(activity));
                       setStep("user");
                     }}
                   >
-                    <h4 className="font-medium">{activity.name}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <h4 className="font-medium">{activity.activity_name}</h4>
+                    {/* <p className="text-sm text-muted-foreground mt-1">
                       {activity.description}
-                    </p>
+                    </p> */}
                   </div>
                 ))}
               </div>
@@ -239,8 +237,8 @@ function ActivityForm() {
                   <Label>Activity Description</Label>
                   <Textarea
                     placeholder="Enter activity description"
-                    value={customActivityName}
-                    onChange={(e) => setCustomActivityName(e.target.value)}
+                    value={customActivityDesc}
+                    onChange={(e) => setCustomActivityDesc(e.target.value)}
                     rows={3}
                   />
                 </div>
@@ -255,7 +253,12 @@ function ActivityForm() {
                   </Button>
                   <Button
                     onClick={() => {
-                      setSelectedActivity("custom");
+                      dispatch(
+                        setSelectedActivity({
+                          activity_name: customActivityName,
+                          activity_desc: customActivityDesc,
+                        })
+                      );
                       setStep("user");
                     }}
                     className="bg-blue-600 hover:bg-blue-500 cursor-pointer"
