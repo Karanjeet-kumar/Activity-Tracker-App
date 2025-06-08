@@ -7,6 +7,7 @@ import { attemptTokenRefresh } from "../utils/refreshToken";
 export const useGetAllCategories = async (dispatch, navigate) => {
   let retried = false;
 
+  // API(CATEGORY_API)--->Connected
   try {
     const accessToken = localStorage.getItem("access_token");
 

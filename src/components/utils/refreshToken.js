@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { REFRESH_TOKEN_API } from "./api_const";
 
 export const attemptTokenRefresh = async (navigate) => {
+  // API(REFRESH_TOKEN_API)--->Connected
   try {
     const refreshToken = localStorage.getItem("refresh_token");
     if (!refreshToken) throw new Error("No refresh token");
