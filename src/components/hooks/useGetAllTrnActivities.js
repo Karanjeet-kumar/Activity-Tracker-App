@@ -16,6 +16,7 @@ const useGetAllTrnActivities = () => {
     let retried = false;
 
     const fetchActivities = async () => {
+      // API(GetAll_TRN_ACTIVITY_API)--->Connected
       try {
         const accessToken = localStorage.getItem("access_token");
 
