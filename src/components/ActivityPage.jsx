@@ -54,6 +54,7 @@ function ActivityPage() {
   const handleAccept = async (activity) => {
     try {
       // 1. Update Acceptance field in TrnActivity
+      // API(UPDATE_TRN_ACTIVITY_API)--->Connected
       await axios.put(
         `${TRN_ACTIVITY_API_END_POINT}/update/${activity.ActivityId}/`,
         {
@@ -81,6 +82,7 @@ function ActivityPage() {
   };
 
   const handleReject = async (activity, comment) => {
+    // API(UPDATE_TRN_ACTIVITY_API)--->Connected
     try {
       const res = await axios.put(
         `${TRN_ACTIVITY_API_END_POINT}/update/${activity.ActivityId}/`,
