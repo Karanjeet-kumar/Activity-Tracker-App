@@ -1,12 +1,13 @@
-export const LOGIN_API = "http://127.0.0.1:8000/api/login/";
-export const LOGOUT_API = "http://127.0.0.1:8000/api/logout/";
-export const REFRESH_TOKEN_API = "http://127.0.0.1:8000/api/token/refresh/";
-export const CATEGORY_API = "http://127.0.0.1:8000/api/get/categories/";
-export const ACTIVITY_API_END_POINT =
-  "http://127.0.0.1:8000/api/get/activities";
-export const USER_API_END_POINT = "http://127.0.0.1:8000/api/get/users";
-export const VERIFIER_API_END_POINT = "http://127.0.0.1:8000/api/get/verifiers";
-export const ADD_ACTIVITY_API = "http://127.0.0.1:8000/api/add/trnActivity/";
-export const TRN_ACTIVITY_API_END_POINT =
-  "http://127.0.0.1:8000/api/trnActivities";
-export const ADD_TASK_API = "http://127.0.0.1:8000/api/add/task/";
+const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
+
+export const LOGIN_API = `${BASE_API_URL}/login/`;
+export const LOGOUT_API = `${BASE_API_URL}/logout/`;
+export const REFRESH_TOKEN_API = `${BASE_API_URL}/token/refresh/`;
+export const CATEGORY_API = `${BASE_API_URL}/get/categories/`;
+export const ACTIVITY_API_END_POINT = `${BASE_API_URL}/get/activities`;
+export const USER_API_END_POINT = `${BASE_API_URL}/get/users`;
+export const VERIFIER_API_END_POINT = `${BASE_API_URL}/get/verifiers`;
+export const ADD_ACTIVITY_API = `${BASE_API_URL}/add/trnActivity/`;
+export const TRN_ACTIVITY_API_END_POINT = `${BASE_API_URL}/trnActivities`;
+export const ADD_TASK_API = `${BASE_API_URL}/add/task/`;
+export const TASK_API_END_POINT = `${BASE_API_URL}/tasks`;

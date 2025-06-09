@@ -1,11 +1,213 @@
-import React, { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import Navbar from "./shared/Navbar";
 import Nav from "./shared/Nav";
-import { LayoutGrid, List, Search, SquareCheckBig } from "lucide-react";
-import { Input } from "./ui/input";
+import {
+  CalendarDays,
+  LayoutGrid,
+  List,
+  Search,
+  SquareCheckBig,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import useGetAllAssignedTasks from "./hooks/useGetAllAssignedTasks";
+import { useSelector } from "react-redux";
 
 function MyTaskPage() {
-  const [viewMode, setViewMode] = useState("card");
+  const { loggedUser } = useSelector((store) => store.auth);
+  const [loading, setLoading] = useState(true);
+  const { allAssignedTask } = useSelector((store) => store.task);
+
+  // +++ ADDED VIEW STATE +++
+  const [viewMode, setViewMode] = useState("card"); // 'card' or 'list'
+
+  // useLoadActivityPage();
+  const { refresh } = useGetAllAssignedTasks();
+
+  useEffect(() => {
+    if (loggedUser) {
+      setLoading(false);
+    }
+  }, [loggedUser]);
+
+  if (loading || !loggedUser) {
+    return (
+      <div>
+        <Navbar />
+        <div className="flex h-screen">
+          <Nav />
+          <div className="flex-1 overflow-auto p-6">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  const renderTasks = () => {
+    if (allAssignedTask?.length === 0) {
+      return (
+        <div>
+          {/* No Activities Section */}
+          <div className="border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center space-y-4 bg-gray-200 hover:bg-gray-300 transition-colors cursor-pointer">
+            <div className="bg-blue-100 rounded-full p-4">
+              <SquareCheckBig className="h-12 w-12 text-blue-600" />
+            </div>
+            <h3 className="text-2xl font-bold tracking-tight">
+              No tasks found
+            </h3>
+            <p className="text-gray-500 text-center max-w-md">
+              You don't have any tasks yet
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    // Card View
+    if (viewMode === "card") {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3">
+          {allAssignedTask.map((task) => (
+            <Card key={task.TaskId}>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-xl">{task.Category}</CardTitle>
+                    <p className="text-sm text-gray-500">
+                      {task.TaskDescription}
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-5">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-2">
+                    <p>Status</p>
+                    <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                      {task.Status}
+                    </span>
+                  </div>
+
+                  <div className="text-sm">
+                    <p>Due Date</p>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CalendarDays className="h-4 w-4 mr-1" />
+                      <span>{task.TargetDate}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800 mb-1">
+                      Description
+                    </p>
+                    <p className="text-sm text-gray-700">{task.Remarks}</p>
+                  </div>
+
+                  <div className="text-sm">
+                    <p>Assigned Date</p>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CalendarDays className="h-4 w-4 mr-1" />
+                      <span>{task.AssignedOn}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-2 border-t">
+                  <div>
+                    <p className="text-xs text-gray-500">Assigned By</p>
+                    <p className="text-sm text-gray-800">{task.CreatedBy}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-500">Verifier</p>
+                    <p className="text-sm text-gray-800">{task.Verifier}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      );
+    }
+
+    // List View
+    return (
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Category
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Activity
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Assigned Date
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Due Date
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Description
+              </th>
+
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Assigned By
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Verifier
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {allAssignedTask.map((task) => (
+              <tr key={task.TaskId} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {task.Category}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {task.TaskDescription}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    {task.Status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <CalendarDays className="h-4 w-4 mr-1" />
+                    <span>{task.AssignedOn}</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <CalendarDays className="h-4 w-4 mr-1" />
+                    <span>{task.TargetDate}</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                  {task.Remarks}
+                </td>
+
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {task.CreatedBy}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {task.Verifier}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
   return (
     <div>
       <Navbar />
@@ -61,6 +263,8 @@ function MyTaskPage() {
               />
             </div>
           </div>
+          {/* +++ RENDER CONDITIONAL VIEW +++ */}
+          {renderTasks()}
         </div>
       </div>
     </div>
