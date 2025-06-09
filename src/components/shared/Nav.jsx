@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
-import { ClipboardList, LayoutDashboard } from "lucide-react";
+import { ClipboardList, SquareCheckBig, LayoutDashboard } from "lucide-react";
 import { useNav } from "../context/NavContext";
 import { useSelector } from "react-redux";
 
@@ -40,6 +40,20 @@ function Nav() {
               {loggedUser?.isAdmin ? "Activities" : "My Activities"}
             </Button>
           </Link>
+        </div>
+
+        <div className="pt-4 border-t">
+          {!loggedUser?.isAdmin && (
+            <Link to="/tasks">
+              <Button
+                variant={activeNav === "/tasks" ? "default" : "ghost"}
+                className="w-full justify-start cursor-pointer"
+              >
+                <SquareCheckBig />
+                My Tasks
+              </Button>
+            </Link>
+          )}
         </div>
       </nav>
     </div>

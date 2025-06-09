@@ -7,6 +7,7 @@ import {
 import Login from "./components/auth/Login";
 import DashBoard from "./components/DashBoard";
 import ActivityPage from "./components/ActivityPage";
+import MyTaskPage from "./components/MyTaskPage";
 
 const appRouter = createBrowserRouter([
   // Client Side
@@ -25,6 +26,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/activities",
     element: <ActivityPage />,
+  },
+  {
+    path: "/tasks",
+    element: <MyTaskPage />,
   },
 ]);
 

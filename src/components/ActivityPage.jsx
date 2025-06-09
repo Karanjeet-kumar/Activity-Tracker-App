@@ -26,7 +26,6 @@ function ActivityPage() {
   const { allTrnActivity, allAssignedActivity } = useSelector(
     (store) => store.activity
   );
-  const hasActivities = true; // Replace with actual data check
 
   // +++ ADDED VIEW STATE +++
   const [viewMode, setViewMode] = useState("card"); // 'card' or 'list'
@@ -106,9 +105,31 @@ function ActivityPage() {
 
   // +++ CONDITIONAL RENDERING FOR ACTIVITIES +++
   const renderActivities = () => {
-    const activities = loggedUser.isAdmin
+    const activities = loggedUser?.isAdmin
       ? allTrnActivity
       : allAssignedActivity;
+
+    if (activities?.length === 0) {
+      return (
+        <div>
+          {/* No Activities Section */}
+          <div className="border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center space-y-4 bg-gray-200 hover:bg-gray-300 transition-colors cursor-pointer">
+            <div className="bg-blue-100 rounded-full p-4">
+              <ClipboardList className="h-12 w-12 text-blue-600" />
+            </div>
+            <h3 className="text-2xl font-bold tracking-tight">
+              No activities found
+            </h3>
+            <p className="text-gray-500 text-center max-w-md">
+              {loggedUser?.isAdmin
+                ? "Get started by creating a new activity"
+                : "You don't have any assigned activities yet"}
+            </p>
+            {!!loggedUser?.isAdmin && <ActivityForm />}
+          </div>
+        </div>
+      );
+    }
 
     // Card View
     if (viewMode === "card") {
@@ -447,24 +468,6 @@ function ActivityPage() {
 
           {/* +++ RENDER CONDITIONAL VIEW +++ */}
           {renderActivities()}
-
-          {/* No Activities Section
-          {!hasActivities && (
-            <div className="border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center space-y-4 bg-gray-200 hover:bg-gray-300 transition-colors cursor-pointer">
-              <div className="bg-blue-100 rounded-full p-4">
-                <ClipboardList className="h-12 w-12 text-blue-600" />
-              </div>
-              <h3 className="text-2xl font-bold tracking-tight">
-                No activities found
-              </h3>
-              <p className="text-gray-500 text-center max-w-md">
-                {loggedUser?.isAdmin
-                  ? "Get started by creating a new activity"
-                  : "You don't have any assigned activities yet"}
-              </p>
-              {!!loggedUser?.isAdmin && <ActivityForm />}
-            </div>
-          )} */}
         </div>
       </div>
     </div>
