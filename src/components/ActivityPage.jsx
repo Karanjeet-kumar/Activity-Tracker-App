@@ -64,6 +64,7 @@ function ActivityPage() {
       );
 
       // 2. Create new TrnActivityTask record
+      // API(ADD_TRN_TASK_ACTIVITY_API)--->Connected
       await axios.post(ADD_TASK_API, {
         TaskDescription: activity.ActivityName,
         assigned_to: loggedUser.user_id,
