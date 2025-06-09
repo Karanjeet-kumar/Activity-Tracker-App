@@ -97,7 +97,9 @@ function ActivityForm({ onActivityCreated }) {
 
       if (userName) params.append("user_name", userName); // matches user_name
       if (userRole) params.append("user_role", userRole); // "HOD" or "EMPLOYEE"
-      if (departmentName) params.append("department_name", departmentName); // partial match
+      if (departmentName && departmentName !== "all") {
+        params.append("department_name", departmentName);
+      }
 
       const response = await axios.get(
         `${USER_API_END_POINT}/${locationId}/?${params.toString()}`
@@ -144,13 +146,13 @@ function ActivityForm({ onActivityCreated }) {
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      handleUsers(`${loggedUser.locationId}`, searchTerm, deptFilter);
+      handleUsers(`${loggedUser.locationId}`, searchTerm, null, deptFilter);
     }, 500); // debounce to avoid too many API calls
 
     return () => clearTimeout(delayDebounce);
   }, [searchTerm, deptFilter]);
 
-  const departments = ["Engineering", "Marketing", "HR", "Finance"];
+  const departments = ["Boiler", "Turbine", "BOP", "IT"];
 
   const handleCreateActivity = async (formData) => {
     // API(ADD_ACTIVITY_API)--->Connected

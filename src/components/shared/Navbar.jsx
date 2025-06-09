@@ -4,7 +4,6 @@ import { Button } from "../ui/button";
 import { Avatar } from "../ui/avatar";
 import { CircleUserRound, LogOut, User2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import logo from "@/assets/react.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { setLoggedUser } from "../redux/authSlice";
@@ -49,11 +48,10 @@ const Navbar = () => {
           onClick={toggleNav}
         >
           <img
-            src={logo}
+            src="/app_logo.png"
             alt="logo"
             style={{
               borderRadius: "20%",
-              border: "1px solid #36efef",
               width: "50px",
               height: "50px",
             }}
