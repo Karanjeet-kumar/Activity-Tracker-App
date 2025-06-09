@@ -33,7 +33,9 @@ const Navbar = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message || "Logout failed");
+      toast.error("Session Expired");
+      dispatch(setLoggedUser(null));
+      navigate("/login");
     } finally {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
