@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -14,39 +14,46 @@ const useGetAllAssignedActivities = () => {
   const { loggedUser } = useSelector((store) => store.auth);
   const userId = loggedUser?.user_id;
 
-  useEffect(() => {
+  const fetchActivities = useCallback(async () => {
+    if (!loggedUser || loggedUser.isAdmin) return; // Skip if admin or no user
+    if (!userId) return;
+
     let retried = false;
 
-    const fetchActivities = async () => {
-      // API(GetAllAssigned_ACTIVITY_API)--->Connected
-      try {
-        const accessToken = localStorage.getItem("access_token");
+    // API(GetAllAssigned_ACTIVITY_API)--->Connected
+    try {
+      const accessToken = localStorage.getItem("access_token");
 
-        if (!accessToken) {
-          toast("Not Authenticated");
-          navigate("/login");
-          return;
-        }
-
-        const res = await axios.get(`${TRN_ACTIVITY_API_END_POINT}/${userId}/`);
-
-        if (res.data.success) {
-          dispatch(setAllAssignedActivity(res.data.assignedActivities));
-        }
-      } catch (error) {
-        if (error.response?.status === 401 && !retried) {
-          retried = true;
-          const refreshed = await attemptTokenRefresh(navigate);
-          if (refreshed) return fetchActivities(); // retry after refresh
-        } else {
-          toast("Failed to fetch Assigned Activities");
-          console.error("Fetch error:", error);
-        }
+      if (!accessToken) {
+        toast("Not Authenticated");
+        navigate("/login");
+        return;
       }
-    };
 
+      const res = await axios.get(`${TRN_ACTIVITY_API_END_POINT}/${userId}/`);
+
+      if (res.data.success) {
+        dispatch(setAllAssignedActivity(res.data.assignedActivities));
+      }
+    } catch (error) {
+      if (error.response?.status === 401 && !retried) {
+        retried = true;
+        const refreshed = await attemptTokenRefresh(navigate);
+        if (refreshed) return fetchActivities(); // retry after refresh
+      } else {
+        toast("Failed to fetch Assigned Activities");
+        console.error("Fetch error:", error);
+      }
+    }
+  }, [dispatch, navigate, userId]);
+
+  // Add useEffect to run on mount
+  useEffect(() => {
     fetchActivities();
-  }, []);
+  }, [fetchActivities]);
+
+  // Return the refresh function
+  return { refresh: fetchActivities };
 };
 
 export default useGetAllAssignedActivities;

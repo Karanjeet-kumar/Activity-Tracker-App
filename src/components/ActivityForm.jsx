@@ -44,7 +44,8 @@ import {
 } from "./utils/api_const";
 import { toast } from "sonner";
 
-function ActivityForm() {
+// function ActivityForm() {
+function ActivityForm({ onActivityCreated }) {
   const { loggedUser } = useSelector((store) => store.auth);
   const {
     allCategories,
@@ -158,6 +159,11 @@ function ActivityForm() {
 
       if (res.data.success) {
         toast.success("Activity Assigned Successfully.");
+
+        // Call the refresh callback if provided
+        if (onActivityCreated) {
+          await onActivityCreated();
+        }
       } else {
         toast.error("Activity Creation Failed");
       }

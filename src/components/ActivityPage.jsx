@@ -31,7 +31,8 @@ function ActivityPage() {
   // +++ ADDED VIEW STATE +++
   const [viewMode, setViewMode] = useState("card"); // 'card' or 'list'
 
-  useLoadActivityPage();
+  // useLoadActivityPage();
+  const { refresh } = useLoadActivityPage();
 
   useEffect(() => {
     if (loggedUser) {
@@ -75,6 +76,7 @@ function ActivityPage() {
         Remarks: activity.AdditionalNote,
       });
       // Optionally refetch activities or update local state
+      await refresh();
       toast.success("Activity Accepted !Go to MyTasks!");
     } catch (error) {
       console.error(error);
@@ -94,6 +96,7 @@ function ActivityPage() {
         }
       );
       // Optionally refetch activities or update local state
+      await refresh();
       toast.success("Activity rejected!");
     } catch (error) {
       console.error(error);
@@ -418,7 +421,9 @@ function ActivityPage() {
                   <List size={18} />
                 </button>
               </div>
-              {!!loggedUser.isAdmin && <ActivityForm />}
+              {!!loggedUser.isAdmin && (
+                <ActivityForm onActivityCreated={refresh} />
+              )}
             </div>
           </div>
 
