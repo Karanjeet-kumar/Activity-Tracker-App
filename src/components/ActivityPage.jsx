@@ -9,14 +9,20 @@ import {
   List,
   Search,
 } from "lucide-react";
-import { useSelector } from "react-redux";
 import ActivityForm from "./ActivityForm";
-import useLoadActivityPage from "./hooks/useLoadActivityPage";
+import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import useLoadActivityPage from "./hooks/useLoadActivityPage";
+import { ADD_TASK_API, TRN_ACTIVITY_API_END_POINT } from "./utils/api_const";
+import { Button } from "./ui/button";
+import axios from "axios";
+import { toast } from "sonner";
 
 function ActivityPage() {
   const { loggedUser } = useSelector((store) => store.auth);
   const [loading, setLoading] = useState(true);
+  const [showRejectComment, setShowRejectComment] = useState(null);
+  const [rejectComment, setRejectComment] = useState("");
   const { allTrnActivity, allAssignedActivity } = useSelector(
     (store) => store.activity
   );
@@ -45,6 +51,54 @@ function ActivityPage() {
     );
   }
 
+  const handleAccept = async (activity) => {
+    try {
+      // 1. Update Acceptance field in TrnActivity
+      await axios.put(
+        `${TRN_ACTIVITY_API_END_POINT}/update/${activity.ActivityId}/`,
+        {
+          Acceptance: "Yes",
+          ActionBy: loggedUser.user_id,
+        }
+      );
+
+      // 2. Create new TrnActivityTask record
+      await axios.post(ADD_TASK_API, {
+        TaskDescription: activity.ActivityName,
+        assigned_to: loggedUser.user_id,
+        AssignedOn: new Date().toISOString().split("T")[0],
+        TargetDate: activity.TargetDate,
+        status: 2,
+        activity: activity.ActivityId,
+        Remarks: activity.AdditionalNote,
+      });
+      // Optionally refetch activities or update local state
+      toast.success("Activity Accepted !Go to MyTasks!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to accept activity.");
+    }
+  };
+
+  const handleReject = async (activity, comment) => {
+    try {
+      const res = await axios.put(
+        `${TRN_ACTIVITY_API_END_POINT}/update/${activity.ActivityId}/`,
+        {
+          Acceptance: "No",
+          ActionBy: loggedUser.user_id,
+          Comments: comment,
+        }
+      );
+      // Optionally refetch activities or update local state
+      toast.success("Activity rejected!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to reject activity.");
+    }
+  };
+
+  // +++ CONDITIONAL RENDERING FOR ACTIVITIES +++
   const renderActivities = () => {
     const activities = loggedUser.isAdmin
       ? allTrnActivity
@@ -65,7 +119,53 @@ function ActivityPage() {
                         {act.ActivityName}
                       </p>
                     </div>
+                    {!loggedUser.isAdmin && (
+                      <div className="flex gap-2">
+                        <Button
+                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded cursor-pointer"
+                          onClick={() => handleAccept(act)}
+                        >
+                          Accept
+                        </Button>
+                        <Button
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
+                          onClick={() =>
+                            setShowRejectComment((prev) =>
+                              prev === act.ActivityId ? null : act.ActivityId
+                            )
+                          }
+                        >
+                          {showRejectComment === act.ActivityId
+                            ? "Cancel"
+                            : "Reject"}
+                        </Button>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Reject Comment Section */}
+                  {showRejectComment === act.ActivityId && (
+                    <div className="mt-3 space-y-2">
+                      <textarea
+                        value={rejectComment}
+                        onChange={(e) => setRejectComment(e.target.value)}
+                        placeholder="Enter reason for rejection..."
+                        className="w-full p-2 border rounded-md focus:ring focus:ring-red-200 focus:border-red-500 min-h-[80px]"
+                      />
+                      <div className="flex justify-end">
+                        <Button
+                          className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded cursor-pointer"
+                          onClick={() => {
+                            handleReject(act, rejectComment);
+                            setRejectComment("");
+                            setShowRejectComment(null);
+                          }}
+                        >
+                          Confirm Reject
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardHeader>
 
@@ -168,6 +268,11 @@ function ActivityPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Verifier
               </th>
+              {!loggedUser.isAdmin && (
+                <th className="px-7 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
+                  Perform Action
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -212,6 +317,53 @@ function ActivityPage() {
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {act.Verifier}
                 </td>
+                {!loggedUser.isAdmin && (
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <div className="flex gap-2">
+                      <Button
+                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded cursor-pointer"
+                        onClick={() => handleAccept(act)}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
+                        onClick={() =>
+                          setShowRejectComment((prev) =>
+                            prev === act.ActivityId ? null : act.ActivityId
+                          )
+                        }
+                      >
+                        {showRejectComment === act.ActivityId
+                          ? "Cancel"
+                          : "Reject"}
+                      </Button>
+                    </div>
+                    {/* Reject Comment Section */}
+                    {showRejectComment === act.ActivityId && (
+                      <div className="mt-3 space-y-2">
+                        <textarea
+                          value={rejectComment}
+                          onChange={(e) => setRejectComment(e.target.value)}
+                          placeholder="Enter reason for rejection..."
+                          className="w-full p-2 border rounded-md focus:ring focus:ring-red-200 focus:border-red-500 min-h-[80px]"
+                        />
+                        <div className="flex justify-end">
+                          <Button
+                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded cursor-pointer"
+                            onClick={() => {
+                              handleReject(act, rejectComment);
+                              setRejectComment("");
+                              setShowRejectComment(null);
+                            }}
+                          >
+                            Confirm Reject
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
