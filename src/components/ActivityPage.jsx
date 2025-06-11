@@ -17,6 +17,7 @@ import { ADD_TASK_API, TRN_ACTIVITY_API_END_POINT } from "./utils/api_const";
 import { Button } from "./ui/button";
 import axios from "axios";
 import { toast } from "sonner";
+import { Textarea } from "./ui/textarea";
 
 function ActivityPage() {
   const { loggedUser } = useSelector((store) => store.auth);
@@ -69,6 +70,11 @@ function ActivityPage() {
         TaskDescription: activity.ActivityName,
         assigned_to: loggedUser.user_id,
         AssignedOn: new Date().toISOString().split("T")[0],
+        // AssignedOn: new Date(
+        //   new Date().getTime() - new Date().getTimezoneOffset() * 60000
+        // )
+        //   .toISOString()
+        //   .slice(0, -1),
         TargetDate: activity.TargetDate,
         status: 2,
         activity: activity.ActivityId,
@@ -156,11 +162,12 @@ function ActivityPage() {
                         </Button>
                         <Button
                           className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
-                          onClick={() =>
+                          onClick={() => {
                             setShowRejectComment((prev) =>
                               prev === act.ActivityId ? null : act.ActivityId
-                            )
-                          }
+                            );
+                            setRejectComment("");
+                          }}
                         >
                           {showRejectComment === act.ActivityId
                             ? "Cancel"
@@ -355,11 +362,12 @@ function ActivityPage() {
                       </Button>
                       <Button
                         className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
-                        onClick={() =>
+                        onClick={() => {
                           setShowRejectComment((prev) =>
                             prev === act.ActivityId ? null : act.ActivityId
-                          )
-                        }
+                          );
+                          setRejectComment("");
+                        }}
                       >
                         {showRejectComment === act.ActivityId
                           ? "Cancel"
@@ -369,7 +377,7 @@ function ActivityPage() {
                     {/* Reject Comment Section */}
                     {showRejectComment === act.ActivityId && (
                       <div className="mt-3 space-y-2">
-                        <textarea
+                        <Textarea
                           value={rejectComment}
                           onChange={(e) => setRejectComment(e.target.value)}
                           placeholder="Enter reason for rejection..."
