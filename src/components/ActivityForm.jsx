@@ -60,9 +60,11 @@ function ActivityForm({ onActivityCreated }) {
     notes,
   } = useSelector((store) => store.form);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("category");
   const [customActivityName, setCustomActivityName] = useState("");
   const [customActivityDesc, setCustomActivityDesc] = useState("");
+  const [userRole, setUserRole] = useState("hod");
   const [searchTerm, setSearchTerm] = useState("");
   const [deptFilter, setDeptFilter] = useState("");
   const [verifierSearch, setVerifierSearch] = useState("");
@@ -87,11 +89,12 @@ function ActivityForm({ onActivityCreated }) {
 
   const handleUsers = async (
     locationId,
-    userName,
     userRole,
+    userName,
     departmentName
   ) => {
     // API(USERS_API)--->Connected
+    // setLoading(true);
     try {
       const params = new URLSearchParams();
 
@@ -107,6 +110,8 @@ function ActivityForm({ onActivityCreated }) {
       dispatch(setAllUsers(response.data.users)); // assuming your API returns user list directly (not inside `users`)
     } catch (error) {
       console.error("Failed to fetch users", error);
+    } finally {
+      // setLoading(false);
     }
   };
 
@@ -132,6 +137,7 @@ function ActivityForm({ onActivityCreated }) {
       dispatch(setSelectedActivity(""));
       setCustomActivityName("");
       setCustomActivityDesc("");
+      setUserRole("hod");
       dispatch(setAllUsers([]));
       dispatch(setAssignedUser(""));
       dispatch(setAllVerifiers([]));
@@ -145,12 +151,12 @@ function ActivityForm({ onActivityCreated }) {
   }, [isDialogOpen]);
 
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      handleUsers(`${loggedUser.locationId}`, searchTerm, null, deptFilter);
-    }, 500); // debounce to avoid too many API calls
+    // const delayDebounce = setTimeout(() => {
+    handleUsers(`${loggedUser.locationId}`, userRole, searchTerm, deptFilter);
+    // }, 100); // debounce to avoid too many API calls
 
-    return () => clearTimeout(delayDebounce);
-  }, [searchTerm, deptFilter]);
+    // return () => clearTimeout(delayDebounce);
+  }, [userRole, searchTerm, deptFilter]);
 
   const departments = ["Boiler", "Turbine", "BOP", "IT"];
 
@@ -290,7 +296,7 @@ function ActivityForm({ onActivityCreated }) {
                     }`}
                     onClick={() => {
                       dispatch(setSelectedActivity(activity));
-                      handleUsers(`${loggedUser.locationId}`);
+                      handleUsers(`${loggedUser.locationId}`, userRole);
                       setStep("user");
                     }}
                   >
@@ -347,7 +353,7 @@ function ActivityForm({ onActivityCreated }) {
                           activity_desc: customActivityDesc,
                         })
                       );
-                      handleUsers(`${loggedUser.locationId}`);
+                      handleUsers(`${loggedUser.locationId}`, userRole);
                       setStep("user");
                     }}
                     className="bg-blue-600 hover:bg-blue-500 cursor-pointer"
@@ -363,15 +369,45 @@ function ActivityForm({ onActivityCreated }) {
           {step === "user" && (
             <div className="mt-4 space-y-4">
               <div className="flex justify-between items-center">
-                <div className="space-y-2">
-                  <Label>Search users...</Label>
-                  <Input
-                    placeholder="Search by name or email..."
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                    }}
-                  />
+                <div className="flex items-end space-x-4">
+                  {/* User Role Toggle */}
+                  <div className="space-y-2">
+                    <Label>Select UserRole</Label>
+                    <div className="flex border rounded-md p-1 gap-2 bg-muted">
+                      <button
+                        className={`px-4 py-1 text-sm cursor-pointer rounded-md  ${
+                          userRole === "hod"
+                            ? "bg-blue-500 text-white"
+                            : "hover:bg-white"
+                        }`}
+                        onClick={() => setUserRole("hod")}
+                      >
+                        HOD
+                      </button>
+                      <button
+                        className={`px-4 py-1 text-sm cursor-pointer rounded-md ${
+                          userRole === "employee"
+                            ? "bg-blue-500 text-white"
+                            : "hover:bg-white"
+                        }`}
+                        onClick={() => setUserRole("employee")}
+                      >
+                        Employee
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Conditionally displayed search */}
+                  {userRole === "employee" && (
+                    <div className="space-y-2">
+                      <Label>Search employees...</Label>
+                      <Input
+                        placeholder="Search by name or email..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label>Filter by department</Label>
@@ -391,6 +427,14 @@ function ActivityForm({ onActivityCreated }) {
                 </div>
               </div>
 
+              {/* {loading ? (
+              <div className="flex items-center justify-center max-h-[300px] h-[300px]">
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full w-12 h-12 animate-spin"></div>
+                  <p className="text-muted-foreground">Loading users...</p>
+                </div>
+              </div>
+              ) : ( */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
                 {allUsers.map((user) => (
                   <div
@@ -421,6 +465,7 @@ function ActivityForm({ onActivityCreated }) {
                   </div>
                 ))}
               </div>
+              {/* )} */}
             </div>
           )}
 
