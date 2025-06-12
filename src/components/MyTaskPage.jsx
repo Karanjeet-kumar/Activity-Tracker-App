@@ -31,6 +31,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+import TaskForm from "./TaskForm";
 
 function MyTaskPage() {
   const { loggedUser } = useSelector((store) => store.auth);
@@ -145,7 +146,7 @@ function MyTaskPage() {
                       >
                         {showUpdateBox === task.TaskId ? "Cancel" : "Update"}
                       </Button>
-                      {/* {!!loggedUser?.isHOD && <TaskForm task={task} />} */}
+                      {!!loggedUser?.isHOD && <TaskForm task={task} />}
                     </div>
                   </div>
 
@@ -398,7 +399,7 @@ function MyTaskPage() {
                       </div>
                     </DialogContent>
                   </Dialog>
-                  {/* {!!loggedUser.isHOD && <TaskForm task={task} />} */}
+                  {!!loggedUser.isHOD && <TaskForm task={task} />}
                 </td>
               </tr>
             ))}
