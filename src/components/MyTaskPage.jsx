@@ -36,7 +36,6 @@ function MyTaskPage() {
   const { loggedUser } = useSelector((store) => store.auth);
   const [loading, setLoading] = useState(true);
   const [showUpdateBox, setShowUpdateBox] = useState(null);
-  const [showAssignBox, setShowAssignBox] = useState(null);
   const [taskFilter, setTaskFilter] = useState("all");
   const [remarks, setRemarks] = useState("");
   const { allAssignedTask } = useSelector((store) => store.task);
@@ -72,7 +71,8 @@ function MyTaskPage() {
         return;
       }
 
-      // Create new TrnTaskUpdate record
+      // Create new TrnTaskUpdate record and Updata TrnActivityTask status
+      // API(ADD_TASK_UPDATE_API)--->Connected
       await axios.post(ADD_TASK_UPDATE_API, {
         task_id: task.TaskId,
         action_by: loggedUser.user_id,
@@ -132,35 +132,21 @@ function MyTaskPage() {
                     </p> */}
                     </div>
 
-                    {!loggedUser?.isHOD ? (
-                      <div>
-                        <Button
-                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded cursor-pointer"
-                          onClick={() => {
-                            setShowUpdateBox((prev) =>
-                              prev === task.TaskId ? null : task.TaskId
-                            );
-                            setRemarks("");
-                            setTaskFilter("all");
-                          }}
-                        >
-                          {showUpdateBox === task.TaskId ? "Cancel" : "Update"}
-                        </Button>
-                      </div>
-                    ) : (
-                      <div>
-                        <Button
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
-                          onClick={() =>
-                            setShowAssignBox((prev) =>
-                              prev === task.TaskId ? null : task.TaskId
-                            )
-                          }
-                        >
-                          {showAssignBox === task.TaskId ? "Cancel" : "Assign"}
-                        </Button>
-                      </div>
-                    )}
+                    <div className="flex gap-2">
+                      <Button
+                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded cursor-pointer"
+                        onClick={() => {
+                          setShowUpdateBox((prev) =>
+                            prev === task.TaskId ? null : task.TaskId
+                          );
+                          setRemarks("");
+                          setTaskFilter("all");
+                        }}
+                      >
+                        {showUpdateBox === task.TaskId ? "Cancel" : "Update"}
+                      </Button>
+                      {/* {!!loggedUser?.isHOD && <TaskForm task={task} />} */}
+                    </div>
                   </div>
 
                   {/* Update Box Section */}
@@ -192,7 +178,7 @@ function MyTaskPage() {
                             value={remarks}
                             onChange={(e) => setRemarks(e.target.value)}
                             placeholder="Enter your remarks here..."
-                            className="w-full p-2 border rounded-md focus:ring focus:ring-red-200 focus:border-red-500 min-h-[80px]"
+                            className="w-full p-2 min-h-[80px]"
                           />
                         </div>
 
@@ -334,162 +320,85 @@ function MyTaskPage() {
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {task.Verifier}
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {!loggedUser.isHOD ? (
-                    <Dialog
-                      open={showUpdateBox === task.TaskId}
-                      onOpenChange={(isOpen) => {
-                        if (!isOpen) setShowUpdateBox(null);
-                      }}
-                    >
-                      <DialogTrigger asChild>
-                        <Button
-                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded cursor-pointer"
-                          onClick={() => {
-                            setShowUpdateBox(task.TaskId);
-                            setRemarks("");
-                            setTaskFilter("all");
-                          }}
-                        >
-                          Update
-                        </Button>
-                      </DialogTrigger>
+                <td className="px-4 py-4 flex gap-2 whitespace-nowrap text-sm text-gray-500">
+                  <Dialog
+                    open={showUpdateBox === task.TaskId}
+                    onOpenChange={(isOpen) => {
+                      if (!isOpen) setShowUpdateBox(null);
+                    }}
+                  >
+                    <DialogTrigger asChild>
+                      <Button
+                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded cursor-pointer"
+                        onClick={() => {
+                          setShowUpdateBox(task.TaskId);
+                          setRemarks("");
+                          setTaskFilter("all");
+                        }}
+                      >
+                        Update
+                      </Button>
+                    </DialogTrigger>
 
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Update Task</DialogTitle>
-                        </DialogHeader>
+                    <DialogContent className="sm:max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Update Task</DialogTitle>
+                      </DialogHeader>
 
-                        <div className="space-y-4 py-4">
-                          {/* Task Status Dropdown */}
-                          <div>
-                            <Select
-                              onValueChange={setTaskFilter}
-                              value={taskFilter}
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select Status" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all">
-                                  Select Status...
-                                </SelectItem>
-                                <SelectItem value="3">In Progress</SelectItem>
-                                <SelectItem value="5">Completed</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          {/* Remarks Textarea */}
-                          <div>
-                            <Textarea
-                              value={remarks}
-                              onChange={(e) => setRemarks(e.target.value)}
-                              placeholder="Enter your remarks here..."
-                              className="w-full min-h-[100px]"
-                            />
-                          </div>
-
-                          {/* Confirm Button */}
-                          <div className="flex justify-end gap-2 pt-2">
-                            <Button
-                              variant="outline"
-                              onClick={() => setShowUpdateBox(null)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              className="bg-blue-500 hover:bg-blue-600"
-                              onClick={() => {
-                                handleUpdate(task);
-                                setRemarks("");
-                                setShowUpdateBox(null);
-                              }}
-                            >
-                              Confirm Update
-                            </Button>
-                          </div>
+                      <div className="space-y-4 py-4">
+                        {/* Task Status Dropdown */}
+                        <div>
+                          <Select
+                            onValueChange={setTaskFilter}
+                            value={taskFilter}
+                          >
+                            <SelectTrigger className="w-full p-2 rounded-lg shadow-md border border-gray-300">
+                              <SelectValue placeholder="Select Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">
+                                Select Status...
+                              </SelectItem>
+                              <SelectItem value="3">In Progress</SelectItem>
+                              <SelectItem value="5">Completed</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
-                      </DialogContent>
-                    </Dialog>
-                  ) : (
-                    <Dialog
-                      open={showUpdateBox === task.TaskId}
-                      onOpenChange={(isOpen) => {
-                        if (!isOpen) setShowUpdateBox(null);
-                      }}
-                    >
-                      <DialogTrigger asChild>
-                        <Button
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
-                          onClick={() => {
-                            // setShowUpdateBox(task.TaskId);
-                            // setRemarks("");
-                            // setTaskFilter("all");
-                          }}
-                        >
-                          Assign
-                        </Button>
-                      </DialogTrigger>
 
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Update Task</DialogTitle>
-                        </DialogHeader>
-
-                        <div className="space-y-4 py-4">
-                          {/* Task Status Dropdown */}
-                          <div>
-                            <Select
-                              onValueChange={setTaskFilter}
-                              value={taskFilter}
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select Status" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="all">
-                                  Select Status...
-                                </SelectItem>
-                                <SelectItem value="3">In Progress</SelectItem>
-                                <SelectItem value="4">Completed</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          {/* Remarks Textarea */}
-                          <div>
-                            <Textarea
-                              value={remarks}
-                              onChange={(e) => setRemarks(e.target.value)}
-                              placeholder="Enter your remarks here..."
-                              className="w-full min-h-[100px]"
-                            />
-                          </div>
-
-                          {/* Confirm Button */}
-                          <div className="flex justify-end gap-2 pt-2">
-                            <Button
-                              variant="outline"
-                              onClick={() => setShowUpdateBox(null)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              className="bg-blue-500 hover:bg-blue-600"
-                              onClick={() => {
-                                handleUpdate(task);
-                                setRemarks("");
-                                setShowUpdateBox(null);
-                              }}
-                            >
-                              Confirm Update
-                            </Button>
-                          </div>
+                        {/* Remarks Textarea */}
+                        <div>
+                          <Textarea
+                            value={remarks}
+                            onChange={(e) => setRemarks(e.target.value)}
+                            placeholder="Enter your remarks here..."
+                            className="w-full p-2 min-h-[80px]"
+                          />
                         </div>
-                      </DialogContent>
-                    </Dialog>
-                  )}
+
+                        {/* Confirm Button */}
+                        <div className="flex justify-end gap-2 pt-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => setShowUpdateBox(null)}
+                            className="bg-slate-200 hover:bg-slate-400 text-black px-4 py-1.5 rounded cursor-pointer"
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded cursor-pointer"
+                            onClick={() => {
+                              handleUpdate(task);
+                              setRemarks("");
+                              setShowUpdateBox(null);
+                            }}
+                          >
+                            Confirm Update
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  {/* {!!loggedUser.isHOD && <TaskForm task={task} />} */}
                 </td>
               </tr>
             ))}
