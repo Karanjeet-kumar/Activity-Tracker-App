@@ -3,6 +3,7 @@ import authSlice from "./authSlice";
 import formSlice from "./formSlice";
 import activitySlice from "./activitySlice";
 import taskSlice from "./taskSlice";
+import taskformSlice from "./taskformSlice";
 
 import {
   persistStore,
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   form: formSlice,
   activity: activitySlice,
   task: taskSlice,
+  taskForm: taskformSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
