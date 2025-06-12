@@ -20,7 +20,7 @@ import {
   setAssignedUser,
   setTargetDate,
 } from "./redux/taskformSlice";
-import { USER_API_END_POINT } from "./utils/api_const";
+import { ADD_TASK_API, USER_API_END_POINT } from "./utils/api_const";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -80,6 +80,33 @@ const TaskForm = ({ task }) => {
     } catch (error) {
       console.error("Failed to fetch users", error);
     } finally {
+    }
+  };
+
+  const handleAssign = async (task) => {
+    try {
+      // Create new TrnActivityTask record
+      await axios.post(ADD_TASK_API, {
+        TaskDescription: taskName,
+        assigned_to: assignedUser.user_id,
+        AssignedOn: new Date().toISOString().split("T")[0],
+        // AssignedOn: new Date(
+        //   new Date().getTime() - new Date().getTimezoneOffset() * 60000
+        // )
+        //   .toISOString()
+        //   .slice(0, -1),
+        TargetDate: targetDate,
+        status: 2,
+        activity: task.ActivityId,
+        Remarks: taskDesc,
+        IsPrimary: "False",
+        reference_task: task.TaskId,
+      });
+      // Optionally refetch activities or update local state
+      toast.success("Task Assigned Successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to assign task.");
     }
   };
 
@@ -263,7 +290,8 @@ const TaskForm = ({ task }) => {
                     } else if (!targetDate) {
                       toast.error("Set the target date...");
                     } else {
-                      // handleAssign(task);
+                      handleAssign(task);
+                      setShowAssignBox(null);
                     }
                   }}
                 >
