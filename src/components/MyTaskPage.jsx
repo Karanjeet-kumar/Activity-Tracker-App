@@ -67,11 +67,6 @@ function MyTaskPage() {
 
   const handleUpdate = async (task) => {
     try {
-      if (taskFilter === "all") {
-        toast.error("Select task status");
-        return;
-      }
-
       // Create new TrnTaskUpdate record and Updata TrnActivityTask status
       // API(ADD_TASK_UPDATE_API)--->Connected
       await axios.post(ADD_TASK_UPDATE_API, {
@@ -188,9 +183,13 @@ function MyTaskPage() {
                           <Button
                             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded cursor-pointer"
                             onClick={() => {
-                              handleUpdate(task);
-                              setRemarks("");
-                              setShowUpdateBox(null);
+                              if (taskFilter === "all") {
+                                toast.error("Select task status...");
+                              } else {
+                                handleUpdate(task);
+                                setRemarks("");
+                                setShowUpdateBox(null);
+                              }
                             }}
                           >
                             Confirm Update

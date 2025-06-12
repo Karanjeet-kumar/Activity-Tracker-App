@@ -12,47 +12,76 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { ArrowLeft } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setTaskName,
+  setTaskDesc,
+  setAllUsers,
+  setAssignedUser,
+  setTargetDate,
+} from "./redux/taskformSlice";
+import { USER_API_END_POINT } from "./utils/api_const";
+import axios from "axios";
+import { toast } from "sonner";
 
 const TaskForm = ({ task }) => {
   const { loggedUser } = useSelector((store) => store.auth);
   const [showAssignBox, setShowAssignBox] = useState(null);
   const [step, setStep] = useState("task");
-  const [taskName, setTaskName] = useState("");
-  const [tasDesc, setTaskDesc] = useState("");
-  const [assignedUser, setAssignedUser] = useState(null);
+  const { taskName, taskDesc, allUsers, assignedUser, targetDate } =
+    useSelector((store) => store.taskForm);
   const [searchTerm, setSearchTerm] = useState("");
-  const [targetDate, setTargetDate] = useState("");
-  const [notes, setNotes] = useState("");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!showAssignBox) {
       setStep("task");
-      setTaskName("");
-      setTaskDesc("");
-      setAssignedUser("");
       setSearchTerm("");
-      setTargetDate("");
-      setNotes("");
+      dispatch(setTaskName(""));
+      dispatch(setTaskDesc(""));
+      dispatch(setAllUsers([]));
+      dispatch(setAssignedUser(""));
+      dispatch(setTargetDate(""));
     }
   }, [showAssignBox]);
 
-  const allUsers = [
-    {
-      user_id: "1",
-      user_name: "Jane Doe",
-      email_id: "jane@example.com",
-      user_role: "USER",
-      department_name: "Engineering",
-    },
-    {
-      user_id: "2",
-      user_name: "Michael Brown",
-      email_id: "michael@example.com",
-      user_role: "HOD",
-      department_name: "Marketing",
-    },
-  ];
+  useEffect(() => {
+    if (step === "user") {
+      handleUsers(
+        `${loggedUser.locationId}`,
+        "EMPLOYEE",
+        searchTerm,
+        `${loggedUser.deptName}`
+      );
+    }
+  }, [searchTerm]);
+
+  const handleUsers = async (
+    locationId,
+    userRole,
+    userName,
+    departmentName
+  ) => {
+    // API(USERS_API)--->Connected
+    // setLoading(true);
+    try {
+      const params = new URLSearchParams();
+
+      if (userName) params.append("user_name", userName); // matches user_name
+      if (userRole) params.append("user_role", userRole); // "HOD" or "EMPLOYEE"
+      if (departmentName && departmentName !== "all") {
+        params.append("department_name", departmentName);
+      }
+
+      const response = await axios.get(
+        `${USER_API_END_POINT}/${locationId}/?${params.toString()}`
+      );
+      dispatch(setAllUsers(response.data.users)); // assuming your API returns user list directly (not inside `users`)
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    } finally {
+    }
+  };
 
   return (
     <Dialog
@@ -100,7 +129,7 @@ const TaskForm = ({ task }) => {
                 <Input
                   placeholder="Enter task name"
                   value={taskName}
-                  onChange={(e) => setTaskName(e.target.value)}
+                  onChange={(e) => dispatch(setTaskName(e.target.value))}
                 />
               </div>
 
@@ -108,8 +137,8 @@ const TaskForm = ({ task }) => {
                 <Label>Task Description</Label>
                 <Textarea
                   placeholder="Enter task description"
-                  value={tasDesc}
-                  onChange={(e) => setTaskDesc(e.target.value)}
+                  value={taskDesc}
+                  onChange={(e) => dispatch(setTaskDesc(e.target.value))}
                   rows={3}
                 />
               </div>
@@ -124,8 +153,17 @@ const TaskForm = ({ task }) => {
                 </Button>
                 <Button
                   onClick={() => {
-                    setStep("user");
-                    // handleUsers(`${loggedUser.locationId}`, userRole);
+                    if (taskName === "") {
+                      toast.error("Task Name field is empty...");
+                    } else {
+                      handleUsers(
+                        `${loggedUser.locationId}`,
+                        "EMPLOYEE",
+                        null,
+                        `${loggedUser.deptName}`
+                      );
+                      setStep("user");
+                    }
                   }}
                   className="bg-blue-600 hover:bg-blue-500 cursor-pointer"
                 >
@@ -149,6 +187,7 @@ const TaskForm = ({ task }) => {
                   />
                 </div>
 
+                {/* Filter by Department */}
                 {/* <div className="space-y-2">
                 <Label>Filter by department</Label>
                 <Select onValueChange={setDeptFilter} value={deptFilter}>
@@ -178,7 +217,7 @@ const TaskForm = ({ task }) => {
                       : "hover:border-blue-500 hover:bg-blue-50"
                   }`}
                   onClick={() => {
-                    setAssignedUser(user);
+                    dispatch(setAssignedUser(user));
                   }}
                 >
                   <div className="font-medium">{user.user_name}</div>
@@ -198,25 +237,13 @@ const TaskForm = ({ task }) => {
             </div>
 
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Target Date</Label>
-                <Input
-                  type="date"
-                  value={targetDate}
-                  onChange={(e) => setTargetDate(e.target.value)}
-                  min={new Date().toISOString().split("T")[0]}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Additional Notes (Optional)</Label>
-                <Textarea
-                  placeholder="Add any specific instructions or context for this activity..."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={3}
-                />
-              </div>
+              <Label>Target Date</Label>
+              <Input
+                type="date"
+                value={targetDate}
+                onChange={(e) => dispatch(setTargetDate(e.target.value))}
+                min={new Date().toISOString().split("T")[0]}
+              />
             </div>
 
             <div className="space-y-4">
@@ -231,7 +258,13 @@ const TaskForm = ({ task }) => {
                 <Button
                   className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded cursor-pointer"
                   onClick={() => {
-                    // handleAssign(task);
+                    if (!assignedUser) {
+                      toast.error("Select the user...");
+                    } else if (!targetDate) {
+                      toast.error("Set the target date...");
+                    } else {
+                      // handleAssign(task);
+                    }
                   }}
                 >
                   Confirm

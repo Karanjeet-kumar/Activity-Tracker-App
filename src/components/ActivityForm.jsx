@@ -152,7 +152,10 @@ function ActivityForm({ onActivityCreated }) {
 
   useEffect(() => {
     // const delayDebounce = setTimeout(() => {
-    handleUsers(`${loggedUser.locationId}`, userRole, searchTerm, deptFilter);
+    if (step === "user") {
+      handleUsers(`${loggedUser.locationId}`, userRole, searchTerm, deptFilter);
+    }
+
     // }, 100); // debounce to avoid too many API calls
 
     // return () => clearTimeout(delayDebounce);
@@ -347,14 +350,18 @@ function ActivityForm({ onActivityCreated }) {
                   </Button>
                   <Button
                     onClick={() => {
-                      dispatch(
-                        setSelectedActivity({
-                          activity_name: customActivityName,
-                          activity_desc: customActivityDesc,
-                        })
-                      );
-                      handleUsers(`${loggedUser.locationId}`, userRole);
-                      setStep("user");
+                      if (customActivityName === "") {
+                        toast.error("Set the custom activity...");
+                      } else {
+                        dispatch(
+                          setSelectedActivity({
+                            activity_name: customActivityName,
+                            activity_desc: customActivityDesc,
+                          })
+                        );
+                        handleUsers(`${loggedUser.locationId}`, userRole);
+                        setStep("user");
+                      }
                     }}
                     className="bg-blue-600 hover:bg-blue-500 cursor-pointer"
                   >
@@ -580,7 +587,15 @@ function ActivityForm({ onActivityCreated }) {
                 </Button>
                 <Button
                   className="bg-blue-600 hover:bg-blue-500 cursor-pointer"
-                  onClick={() => handleCreateActivity(formData)}
+                  onClick={() => {
+                    if (assignedVerifier === "") {
+                      toast.error("Select the verifier...");
+                    } else if (!targetDate) {
+                      toast.error("Set the target date...");
+                    } else {
+                      handleCreateActivity(formData);
+                    }
+                  }}
                 >
                   Assign Activity
                 </Button>
