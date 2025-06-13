@@ -5,6 +5,7 @@ const activitySlice = createSlice({
   initialState: {
     allTrnActivity: [],
     allAssignedActivity: [],
+    allVerifierActivity: [],
   },
   reducers: {
     // actions
@@ -14,10 +15,16 @@ const activitySlice = createSlice({
     setAllAssignedActivity: (state, action) => {
       state.allAssignedActivity = action.payload;
     },
+    setAllVerifierActivity: (state, action) => {
+      state.allVerifierActivity = action.payload;
+    },
   },
 });
 
-export const { setAllTrnActivity, setAllAssignedActivity } =
-  activitySlice.actions;
+export const {
+  setAllTrnActivity,
+  setAllAssignedActivity,
+  setAllVerifierActivity,
+} = activitySlice.actions;
 
 export default activitySlice.reducer;
