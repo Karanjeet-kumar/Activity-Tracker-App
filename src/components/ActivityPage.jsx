@@ -139,124 +139,289 @@ function ActivityPage() {
 
     // Card View
     if (viewMode === "card") {
+      // return (
+      //   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3">
+      //     {activities.map((act) => (
+      //       <Card key={act.ActivityId}>
+      //         <CardHeader>
+      //           <div>
+      //             <div className="flex justify-between items-start">
+      //               <div>
+      //                 <CardTitle className="text-xl">{act.Category}</CardTitle>
+      //                 <p className="text-sm text-gray-500">
+      //                   {act.ActivityName}
+      //                 </p>
+      //               </div>
+      //               {!loggedUser.isAdmin && (
+      //                 <div className="flex gap-2">
+      //                   <Button
+      //                     className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded cursor-pointer"
+      //                     onClick={() => handleAccept(act)}
+      //                   >
+      //                     Accept
+      //                   </Button>
+      //                   <Button
+      //                     className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
+      //                     onClick={() => {
+      //                       setShowRejectComment((prev) =>
+      //                         prev === act.ActivityId ? null : act.ActivityId
+      //                       );
+      //                       setRejectComment("");
+      //                     }}
+      //                   >
+      //                     {showRejectComment === act.ActivityId
+      //                       ? "Cancel"
+      //                       : "Reject"}
+      //                   </Button>
+      //                 </div>
+      //               )}
+      //             </div>
+
+      //             {/* Reject Comment Section */}
+      //             {showRejectComment === act.ActivityId && (
+      //               <div className="mt-3 space-y-2">
+      //                 <textarea
+      //                   value={rejectComment}
+      //                   onChange={(e) => setRejectComment(e.target.value)}
+      //                   placeholder="Enter reason for rejection..."
+      //                   className="w-full p-2 border rounded-md focus:ring focus:ring-red-200 focus:border-red-500 min-h-[80px]"
+      //                 />
+      //                 <div className="flex justify-end">
+      //                   <Button
+      //                     className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded cursor-pointer"
+      //                     onClick={() => {
+      //                       handleReject(act, rejectComment);
+      //                       setRejectComment("");
+      //                       setShowRejectComment(null);
+      //                     }}
+      //                   >
+      //                     Confirm Reject
+      //                   </Button>
+      //                 </div>
+      //               </div>
+      //             )}
+      //           </div>
+      //         </CardHeader>
+
+      //         <CardContent className="space-y-5">
+      //           <div className="flex justify-between items-center">
+      //             {/* Status only shown for admin */}
+      //             {!!loggedUser.isAdmin && (
+      //               <div className="flex items-center space-x-2">
+      //                 <p>Status</p>
+      //                 <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">
+      //                   {act.Status}
+      //                 </span>
+      //               </div>
+      //             )}
+
+      //             <div className="text-sm">
+      //               <p>Due Date</p>
+      //               <div className="flex items-center text-sm text-gray-600">
+      //                 <CalendarDays className="h-4 w-4 mr-1" />
+      //                 <span>{act.TargetDate}</span>
+      //               </div>
+      //             </div>
+      //           </div>
+
+      //           <div>
+      //             <p className="text-sm font-semibold text-gray-800 mb-1">
+      //               Description
+      //             </p>
+      //             <p className="text-sm text-gray-700">{act.AdditionalNote}</p>
+      //           </div>
+
+      //           <div className="flex justify-between items-center pt-2 border-t">
+      //             <div>
+      //               <p className="text-xs text-gray-500">
+      //                 {loggedUser.isAdmin ? "Assigned To" : "Assigned By"}
+      //               </p>
+      //               {loggedUser.isAdmin ? (
+      //                 <>
+      //                   <p className="text-sm text-gray-800">
+      //                     {act.AssignedUserRole}-{act.AssignedUser}
+      //                   </p>
+      //                   <p className="text-sm text-gray-800">
+      //                     Dept-{act.Department}
+      //                   </p>
+      //                 </>
+      //               ) : (
+      //                 <p className="text-sm text-gray-800">{act.CreatedBy}</p>
+      //               )}
+      //             </div>
+
+      //             <div>
+      //               <p className="text-xs text-gray-500">Verifier</p>
+      //               <p className="text-sm text-gray-800">{act.Verifier}</p>
+      //             </div>
+      //           </div>
+      //         </CardContent>
+      //       </Card>
+      //     ))}
+      //   </div>
+      // );
+
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
           {activities.map((act) => (
-            <Card key={act.ActivityId}>
-              <CardHeader>
-                <div>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-xl">{act.Category}</CardTitle>
-                      <p className="text-sm text-gray-500">
-                        {act.ActivityName}
-                      </p>
-                    </div>
-                    {!loggedUser.isAdmin && (
-                      <div className="flex gap-2">
-                        <Button
-                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded cursor-pointer"
-                          onClick={() => handleAccept(act)}
-                        >
-                          Accept
-                        </Button>
-                        <Button
-                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
-                          onClick={() => {
-                            setShowRejectComment((prev) =>
-                              prev === act.ActivityId ? null : act.ActivityId
-                            );
-                            setRejectComment("");
-                          }}
-                        >
-                          {showRejectComment === act.ActivityId
-                            ? "Cancel"
-                            : "Reject"}
-                        </Button>
-                      </div>
-                    )}
+            <div
+              key={act.ActivityId}
+              className=" border border-gray-400 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            >
+              <CardHeader className="p-3 space-y-2">
+                <div className="flex justify-between items-start gap-1">
+                  <div>
+                    <CardTitle className="text-base font-medium text-gray-800 line-clamp-1">
+                      {act.ActivityName}
+                    </CardTitle>
+                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+                      {act.Category}
+                    </p>
                   </div>
 
-                  {/* Reject Comment Section */}
-                  {showRejectComment === act.ActivityId && (
-                    <div className="mt-3 space-y-2">
+                  {!loggedUser.isAdmin && (
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer"
+                        onClick={() => handleAccept(act)}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer"
+                        onClick={() => {
+                          setShowRejectComment((prev) =>
+                            prev === act.ActivityId ? null : act.ActivityId
+                          );
+                          setRejectComment("");
+                        }}
+                      >
+                        {showRejectComment === act.ActivityId
+                          ? "✕ Cancel"
+                          : "Reject"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Status and Dates */}
+                <div className="flex justify-between items-center">
+                  {!!loggedUser.isAdmin && (
+                    <span
+                      className={`text-xs px-1.5 py-0.5 rounded ${
+                        act.Status === "Rejected"
+                          ? "bg-red-200 text-red-800"
+                          : act.Status === "Completed"
+                          ? "bg-green-200 text-green-800"
+                          : "bg-yellow-200 text-yellow-800"
+                      }`}
+                    >
+                      {act.Status}
+                    </span>
+                  )}
+                  <div>
+                    <p className=" text-xs font-medium text-gray-700 mb-0.5">
+                      Target Date
+                    </p>
+                    <div className="text-xs text-gray-500 flex items-center">
+                      <CalendarDays className="h-3.5 w-3.5 mr-1" />
+                      {act.TargetDate}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Reject Comment Section */}
+                {showRejectComment === act.ActivityId && (
+                  <div className="mt-2 p-2 bg-gray-50 rounded-md border border-gray-200">
+                    <div className="space-y-2">
                       <textarea
                         value={rejectComment}
                         onChange={(e) => setRejectComment(e.target.value)}
-                        placeholder="Enter reason for rejection..."
-                        className="w-full p-2 border rounded-md focus:ring focus:ring-red-200 focus:border-red-500 min-h-[80px]"
+                        placeholder="Reason for rejection..."
+                        className="w-full p-1.5 text-xs border rounded focus:ring focus:ring-red-100 min-h-[60px]"
                       />
                       <div className="flex justify-end">
                         <Button
-                          className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded cursor-pointer"
+                          size="sm"
+                          className="h-7 px-3 text-xs bg-red-600 hover:bg-red-700 cursor-pointer"
                           onClick={() => {
-                            handleReject(act, rejectComment);
-                            setRejectComment("");
-                            setShowRejectComment(null);
+                            if (rejectComment === "") {
+                              toast.error("Enter the reason to proceed...");
+                            } else {
+                              handleReject(act, rejectComment);
+                              setRejectComment("");
+                              setShowRejectComment(null);
+                            }
                           }}
                         >
-                          Confirm Reject
+                          Confirm
                         </Button>
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </CardHeader>
 
-              <CardContent className="space-y-5">
-                <div className="flex justify-between items-center">
-                  {/* Status only shown for admin */}
-                  {!!loggedUser.isAdmin && (
-                    <div className="flex items-center space-x-2">
-                      <p>Status</p>
-                      <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                        {act.Status}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="text-sm">
-                    <p>Due Date</p>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <CalendarDays className="h-4 w-4 mr-1" />
-                      <span>{act.TargetDate}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-sm font-semibold text-gray-800 mb-1">
-                    Description
+              <CardContent className="p-3 pt-0 space-y-2">
+                <div className="text-xs">
+                  <p className="font-medium text-gray-700 mb-1">Description:</p>
+                  <p className="text-gray-600 line-clamp-3">
+                    {act.AdditionalNote}
                   </p>
-                  <p className="text-sm text-gray-700">{act.AdditionalNote}</p>
                 </div>
 
-                <div className="flex justify-between items-center pt-2 border-t">
+                <div
+                  className={` rounded-2xl flex justify-between text-xs p-2 border border-gray-400 ${
+                    act.Status === "Rejected"
+                      ? "bg-red-200 "
+                      : act.Status === "Completed"
+                      ? "bg-green-200 "
+                      : "bg-yellow-200"
+                  }`}
+                >
                   <div>
-                    <p className="text-xs text-gray-500">
-                      {loggedUser.isAdmin ? "Assigned To" : "Assigned By"}
+                    <p className="text-gray-500">Assigned On:</p>
+                    <p className="text-gray-700">
+                      {act.CreatedOn.split("T")[0]}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">
+                      {loggedUser.isAdmin ? "Assigned To:" : "Assigned By:"}
                     </p>
                     {loggedUser.isAdmin ? (
                       <>
-                        <p className="text-sm text-gray-800">
-                          {act.AssignedUserRole}-{act.AssignedUser}
-                        </p>
-                        <p className="text-sm text-gray-800">
-                          Dept-{act.Department}
+                        <p className="text-gray-700 truncate max-w-[100px]">
+                          {act.AssignedUser}
                         </p>
                       </>
                     ) : (
-                      <p className="text-sm text-gray-800">{act.CreatedBy}</p>
+                      <p className="text-gray-700 truncate max-w-[100px]">
+                        {act.CreatedBy}
+                      </p>
                     )}
                   </div>
 
                   <div>
-                    <p className="text-xs text-gray-500">Verifier</p>
-                    <p className="text-sm text-gray-800">{act.Verifier}</p>
+                    <p className="text-gray-500">Verifier:</p>
+                    <p className="text-gray-700">{act.Verifier}</p>
                   </div>
                 </div>
+
+                {!!loggedUser.isAdmin && (
+                  <div className="rounded-2xl flex justify-around items-center text-xs p-2 border border-gray-400 bg-cyan-200">
+                    <p className="text-gray-700 ">
+                      Assigned User-{act.AssignedUserRole}
+                    </p>
+                    <p className="text-gray-700 ">
+                      Department-{act.Department}
+                    </p>
+                  </div>
+                )}
               </CardContent>
-            </Card>
+            </div>
           ))}
         </div>
       );
@@ -269,10 +434,10 @@ function ActivityPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Category
+                Activity
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Activity
+                Category
               </th>
               {!!loggedUser.isAdmin && (
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -280,7 +445,10 @@ function ActivityPage() {
                 </th>
               )}
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Due Date
+                Assigned On
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Target Date
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Description
@@ -313,10 +481,10 @@ function ActivityPage() {
             {activities.map((act) => (
               <tr key={act.ActivityId} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {act.Category}
+                  {act.ActivityName}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {act.ActivityName}
+                  {act.Category}
                 </td>
                 {!!loggedUser.isAdmin && (
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -325,6 +493,12 @@ function ActivityPage() {
                     </span>
                   </td>
                 )}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <CalendarDays className="h-4 w-4 mr-1" />
+                    <span>{act.CreatedOn.split("T")[0]}</span>
+                  </div>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div className="flex items-center">
                     <CalendarDays className="h-4 w-4 mr-1" />
@@ -355,13 +529,15 @@ function ActivityPage() {
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex gap-2">
                       <Button
-                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded cursor-pointer"
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer"
                         onClick={() => handleAccept(act)}
                       >
                         Accept
                       </Button>
                       <Button
-                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer"
                         onClick={() => {
                           setShowRejectComment((prev) =>
                             prev === act.ActivityId ? null : act.ActivityId
@@ -370,7 +546,7 @@ function ActivityPage() {
                         }}
                       >
                         {showRejectComment === act.ActivityId
-                          ? "Cancel"
+                          ? "✕ Cancel"
                           : "Reject"}
                       </Button>
                     </div>
@@ -385,14 +561,19 @@ function ActivityPage() {
                         />
                         <div className="flex justify-end">
                           <Button
-                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded cursor-pointer"
+                            size="sm"
+                            className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer"
                             onClick={() => {
-                              handleReject(act, rejectComment);
-                              setRejectComment("");
-                              setShowRejectComment(null);
+                              if (rejectComment === "") {
+                                toast.error("Enter the reason to proceed...");
+                              } else {
+                                handleReject(act, rejectComment);
+                                setRejectComment("");
+                                setShowRejectComment(null);
+                              }
                             }}
                           >
-                            Confirm Reject
+                            Confirm
                           </Button>
                         </div>
                       </div>

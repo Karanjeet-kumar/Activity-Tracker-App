@@ -119,7 +119,8 @@ const TaskForm = ({ task }) => {
     >
       <DialogTrigger asChild>
         <Button
-          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
+          size="sm"
+          className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer"
           onClick={() => {
             setShowAssignBox(task.TaskId);
           }}
