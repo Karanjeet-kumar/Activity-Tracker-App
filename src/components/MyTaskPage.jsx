@@ -44,7 +44,7 @@ function MyTaskPage() {
   // +++ ADDED VIEW STATE +++
   const [viewMode, setViewMode] = useState("card"); // 'card' or 'list'
 
-  // useLoadActivityPage();
+  // UseLoadTaskPage();
   const { refresh } = useGetAllAssignedTasks();
 
   useEffect(() => {
@@ -72,12 +72,11 @@ function MyTaskPage() {
       await axios.post(ADD_TASK_UPDATE_API, {
         task_id: task.TaskId,
         action_by: loggedUser.user_id,
-        ActionOn: new Date().toISOString().split("T")[0],
-        // AssignedOn: new Date(
-        //   new Date().getTime() - new Date().getTimezoneOffset() * 60000
-        // )
-        //   .toISOString()
-        //   .slice(0, -1),
+        ActionOn: new Date(
+          new Date().getTime() - new Date().getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .slice(0, -1),
         action_status: taskFilter,
         Remarks: remarks,
       });
@@ -254,22 +253,24 @@ function MyTaskPage() {
       // );
 
       return (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {allAssignedTask.map((task) => (
             <div
               key={task.TaskId}
               className=" border border-gray-400 rounded-lg shadow-md hover:shadow-lg transition-shadow"
             >
               <CardHeader className="p-3 space-y-2">
-                <div className="flex justify-between items-start gap-2">
-                  <CardTitle className="text-base font-medium text-gray-800 line-clamp-2">
-                    {task.TaskDescription}
-                  </CardTitle>
+                <div className="flex justify-between items-center">
+                  <div className="max-w-[60%]">
+                    <CardTitle className="text-base font-medium text-gray-800 line-clamp-2">
+                      {task.TaskDescription}
+                    </CardTitle>
+                  </div>
 
                   <div className="flex gap-1">
                     <Button
                       size="sm"
-                      className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer"
+                      className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => {
                         setShowUpdateBox((prev) =>
                           prev === task.TaskId ? null : task.TaskId
@@ -277,6 +278,7 @@ function MyTaskPage() {
                         setRemarks("");
                         setTaskFilter("all");
                       }}
+                      disabled={task.Status === "Completed"}
                     >
                       {showUpdateBox === task.TaskId ? "✕ Cancel" : "Update"}
                     </Button>
@@ -286,17 +288,17 @@ function MyTaskPage() {
 
                 {/* Status and Dates */}
                 <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-1">
-                    <span
-                      className={`text-xs px-1.5 py-0.5 rounded ${
-                        task.Status === "Completed"
-                          ? "bg-green-200 text-green-800"
-                          : "bg-yellow-200 text-yellow-800"
-                      }`}
-                    >
-                      {task.Status}
-                    </span>
-                  </div>
+                  <span
+                    className={`text-xs px-1.5 py-0.5 rounded border ${
+                      task.Status === "Completed"
+                        ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
+                        : task.Status === "InProgress"
+                        ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
+                        : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
+                    }`}
+                  >
+                    {task.Status}
+                  </span>
                   <div>
                     <p className=" text-xs font-medium text-gray-700 mb-0.5">
                       Target Date
@@ -354,22 +356,26 @@ function MyTaskPage() {
 
               <CardContent className="p-3 pt-0 space-y-2">
                 <div className="text-xs">
-                  <p className="font-medium text-gray-700 mb-1">Description:</p>
+                  <p className="font-medium text-gray-700 mb-0.5">
+                    Description:
+                  </p>
                   <p className="text-gray-600 line-clamp-3">{task.Remarks}</p>
                 </div>
 
                 <div
-                  className={` rounded-2xl flex justify-between text-xs p-2 border border-gray-400 ${
-                    task.Status === "Rejected"
-                      ? "bg-red-200 "
-                      : task.Status === "Completed"
-                      ? "bg-green-200 "
-                      : "bg-yellow-200"
+                  className={` rounded-2xl flex justify-between text-xs p-2 border ${
+                    task.Status === "Completed"
+                      ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 "
+                      : task.Status === "InProgress"
+                      ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 "
+                      : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 "
                   }`}
                 >
                   <div>
                     <p className="text-gray-500">Started On:</p>
-                    <p className="text-gray-700">{task.AssignedOn}</p>
+                    <p className="text-gray-700">
+                      {task.AssignedOn.split("T")[0]}
+                    </p>
                   </div>
                   <div>
                     <p className="text-gray-500">Assigned By:</p>
@@ -431,14 +437,22 @@ function MyTaskPage() {
                   {task.TaskDescription}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                  <span
+                    className={`text-xs font-medium px-2.5 py-0.5 rounded border ${
+                      task.Status === "Completed"
+                        ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
+                        : task.Status === "InProgress"
+                        ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
+                        : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
+                    }`}
+                  >
                     {task.Status}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <div className="flex items-center">
                     <CalendarDays className="h-4 w-4 mr-1" />
-                    <span>{task.AssignedOn}</span>
+                    <span>{task.AssignedOn.split("T")[0]}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -467,12 +481,13 @@ function MyTaskPage() {
                     <DialogTrigger asChild>
                       <Button
                         size="sm"
-                        className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer"
+                        className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => {
                           setShowUpdateBox(task.TaskId);
                           setRemarks("");
                           setTaskFilter("all");
                         }}
+                        disabled={task.Status === "Completed"}
                       >
                         Update
                       </Button>

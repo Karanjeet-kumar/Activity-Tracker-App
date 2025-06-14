@@ -61,6 +61,11 @@ function ActivityPage() {
         {
           Acceptance: "Yes",
           ActionBy: loggedUser.user_id,
+          ActionOn: new Date(
+            new Date().getTime() - new Date().getTimezoneOffset() * 60000
+          )
+            .toISOString()
+            .slice(0, -1),
         }
       );
 
@@ -69,12 +74,11 @@ function ActivityPage() {
       await axios.post(ADD_TASK_API, {
         TaskDescription: activity.ActivityName,
         assigned_to: loggedUser.user_id,
-        AssignedOn: new Date().toISOString().split("T")[0],
-        // AssignedOn: new Date(
-        //   new Date().getTime() - new Date().getTimezoneOffset() * 60000
-        // )
-        //   .toISOString()
-        //   .slice(0, -1),
+        AssignedOn: new Date(
+          new Date().getTime() - new Date().getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .slice(0, -1),
         TargetDate: activity.TargetDate,
         status: 2,
         activity: activity.ActivityId,
@@ -97,6 +101,11 @@ function ActivityPage() {
         {
           Acceptance: "No",
           ActionBy: loggedUser.user_id,
+          ActionOn: new Date(
+            new Date().getTime() - new Date().getTimezoneOffset() * 60000
+          )
+            .toISOString()
+            .slice(0, -1),
           Comments: comment,
         }
       );
@@ -262,15 +271,15 @@ function ActivityPage() {
       // );
 
       return (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {activities.map((act) => (
             <div
               key={act.ActivityId}
               className=" border border-gray-400 rounded-lg shadow-md hover:shadow-lg transition-shadow"
             >
               <CardHeader className="p-3 space-y-2">
-                <div className="flex justify-between items-start gap-1">
-                  <div>
+                <div className="flex justify-between items-center">
+                  <div className="max-w-[60%]">
                     <CardTitle className="text-base font-medium text-gray-800 line-clamp-1">
                       {act.ActivityName}
                     </CardTitle>
@@ -310,12 +319,14 @@ function ActivityPage() {
                 <div className="flex justify-between items-center">
                   {!!loggedUser.isAdmin && (
                     <span
-                      className={`text-xs px-1.5 py-0.5 rounded ${
-                        act.Status === "Rejected"
-                          ? "bg-red-200 text-red-800"
-                          : act.Status === "Completed"
-                          ? "bg-green-200 text-green-800"
-                          : "bg-yellow-200 text-yellow-800"
+                      className={`text-xs px-1.5 py-0.5 rounded border ${
+                        act.Status === "Completed"
+                          ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
+                          : act.Status === "InProgress"
+                          ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
+                          : act.Status === "Rejected"
+                          ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
+                          : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
                       }`}
                     >
                       {act.Status}
@@ -366,19 +377,23 @@ function ActivityPage() {
 
               <CardContent className="p-3 pt-0 space-y-2">
                 <div className="text-xs">
-                  <p className="font-medium text-gray-700 mb-1">Description:</p>
+                  <p className="font-medium text-gray-700 mb-0.5">
+                    Description:
+                  </p>
                   <p className="text-gray-600 line-clamp-3">
                     {act.AdditionalNote}
                   </p>
                 </div>
 
                 <div
-                  className={` rounded-2xl flex justify-between text-xs p-2 border border-gray-400 ${
-                    act.Status === "Rejected"
-                      ? "bg-red-200 "
-                      : act.Status === "Completed"
-                      ? "bg-green-200 "
-                      : "bg-yellow-200"
+                  className={` rounded-2xl flex justify-between text-xs p-2 border ${
+                    act.Status === "Completed"
+                      ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800"
+                      : act.Status === "InProgress"
+                      ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800"
+                      : act.Status === "Rejected"
+                      ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800"
+                      : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800"
                   }`}
                 >
                   <div>
@@ -411,7 +426,7 @@ function ActivityPage() {
                 </div>
 
                 {!!loggedUser.isAdmin && (
-                  <div className="rounded-2xl flex justify-around items-center text-xs p-2 border border-gray-400 bg-cyan-200">
+                  <div className="rounded-2xl flex justify-around items-center text-xs p-2 bg-gradient-to-r from-cyan-500 to-cyan-300 border border-cyan-800 ">
                     <p className="text-gray-700 ">
                       Assigned User-{act.AssignedUserRole}
                     </p>
@@ -488,7 +503,17 @@ function ActivityPage() {
                 </td>
                 {!!loggedUser.isAdmin && (
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    <span
+                      className={`text-xs font-medium px-2.5 py-0.5 rounded border ${
+                        act.Status === "Completed"
+                          ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
+                          : act.Status === "InProgress"
+                          ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
+                          : act.Status === "Rejected"
+                          ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
+                          : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
+                      }`}
+                    >
                       {act.Status}
                     </span>
                   </td>
@@ -510,7 +535,7 @@ function ActivityPage() {
                 </td>
                 {loggedUser.isAdmin ? (
                   <>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
                       {act.AssignedUserRole}-{act.AssignedUser}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">

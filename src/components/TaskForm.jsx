@@ -89,12 +89,11 @@ const TaskForm = ({ task }) => {
       await axios.post(ADD_TASK_API, {
         TaskDescription: taskName,
         assigned_to: assignedUser.user_id,
-        AssignedOn: new Date().toISOString().split("T")[0],
-        // AssignedOn: new Date(
-        //   new Date().getTime() - new Date().getTimezoneOffset() * 60000
-        // )
-        //   .toISOString()
-        //   .slice(0, -1),
+        AssignedOn: new Date(
+          new Date().getTime() - new Date().getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .slice(0, -1),
         TargetDate: targetDate,
         status: 2,
         activity: task.ActivityId,
@@ -120,10 +119,11 @@ const TaskForm = ({ task }) => {
       <DialogTrigger asChild>
         <Button
           size="sm"
-          className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer"
+          className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={() => {
             setShowAssignBox(task.TaskId);
           }}
+          disabled={task.Status === "Completed"}
         >
           Assign
         </Button>
@@ -271,6 +271,7 @@ const TaskForm = ({ task }) => {
                 value={targetDate}
                 onChange={(e) => dispatch(setTargetDate(e.target.value))}
                 min={new Date().toISOString().split("T")[0]}
+                max={new Date(task.TargetDate).toISOString().split("T")[0]}
               />
             </div>
 
