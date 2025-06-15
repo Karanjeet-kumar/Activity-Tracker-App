@@ -18,6 +18,7 @@ import { Button } from "./ui/button";
 import axios from "axios";
 import { toast } from "sonner";
 import { Textarea } from "./ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 function ActivityPage() {
   const { loggedUser } = useSelector((store) => store.auth);
@@ -33,6 +34,16 @@ function ActivityPage() {
 
   // useLoadActivityPage();
   const { refresh } = useLoadActivityPage();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      refresh(searchTerm, statusFilter); // pass activityName, status left empty
+    }, 500); // adjust debounce time as needed
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, statusFilter, refresh]);
 
   useEffect(() => {
     if (loggedUser) {
@@ -669,6 +680,57 @@ function ActivityPage() {
             </div>
           </div>
 
+          {/* Status Filter Tabs */}
+          {!!loggedUser?.isAdmin && (
+            <div className="mb-6">
+              <Tabs
+                value={statusFilter}
+                onValueChange={(value) => {
+                  setStatusFilter(value);
+                }}
+              >
+                <TabsList className="grid grid-cols-6 w-full gap-2 bg-cyan-300">
+                  <TabsTrigger
+                    value=""
+                    className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
+                  >
+                    All
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="1"
+                    className="bg-white hover:bg-blue-200 data-[state=active]:bg-blue-400"
+                  >
+                    New
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="3"
+                    className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
+                  >
+                    In Progress
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="7"
+                    className="bg-white hover:bg-red-200 data-[state=active]:bg-red-400"
+                  >
+                    Rejected
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="5"
+                    className="bg-white hover:bg-green-200 data-[state=active]:bg-green-400"
+                  >
+                    Completed
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="6"
+                    className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
+                  >
+                    Closed
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+          )}
+
           <div className="mb-2">
             <h1 className="text-lg font-bold">
               {loggedUser?.isAdmin
@@ -683,6 +745,8 @@ function ActivityPage() {
               <Input
                 placeholder="Search activities..."
                 className="pl-10 py-3 text-md"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
