@@ -23,7 +23,7 @@ function Nav() {
 
   if (!isNavVisible) return null; // Hide nav when not visible
   return (
-    <div className="w-64 bg-gradient-to-b from-blue-500 to-blue-900 p-4 border-r">
+    <div className="w-64 bg-gradient-to-b from-blue-500 to-blue-900 p-4 border-r fixed top-16 left-0 h-[calc(100vh-4rem)] z-40 overflow-y-auto">
       <nav className="space-y-4">
         <div className="space-y-2">
           <Link to="/dashboard">
@@ -31,7 +31,7 @@ function Nav() {
               variant={activeNav === "/dashboard" ? "default" : "ghost"}
               className="w-full justify-start cursor-pointer mb-2"
             >
-              <LayoutDashboard />
+              <LayoutDashboard className="mr-4" />
               Dashboard
             </Button>
           </Link>
@@ -41,7 +41,7 @@ function Nav() {
               variant={activeNav === "/activities" ? "default" : "ghost"}
               className="w-full justify-start cursor-pointer"
             >
-              <ClipboardList />
+              <ClipboardList className="mr-4" />
               {loggedUser?.isAdmin ? "Activities" : "My Activities"}
             </Button>
           </Link>
@@ -56,7 +56,7 @@ function Nav() {
                     variant={activeNav === "/tasks" ? "default" : "ghost"}
                     className="w-full justify-start cursor-pointer mb-2"
                   >
-                    <SquareCheckBig />
+                    <SquareCheckBig className="mr-4" />
                     My Tasks
                   </Button>
                 </Link>
@@ -66,7 +66,7 @@ function Nav() {
                     variant={activeNav === "/review" ? "default" : "ghost"}
                     className="w-full justify-start cursor-pointer"
                   >
-                    <CopyCheck />
+                    <CopyCheck className="mr-4" />
                     My Reviews
                   </Button>
                 </Link>

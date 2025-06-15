@@ -8,8 +8,10 @@ import {
   Clock4,
   LayoutDashboard,
 } from "lucide-react";
+import { useNav } from "./context/NavContext";
 
 function Dashboard() {
+  const { isNavVisible } = useNav();
   const [selectedCard, setSelectedCard] = useState("Total Tasks");
 
   const cards = [
@@ -49,8 +51,12 @@ function Dashboard() {
       <div className="flex h-screen">
         <Nav />
         {/* Main Content */}
-        <div className="flex-1 overflow-auto p-6">
-          <div className="flex items-center gap-2 mb-8">
+        <div
+          className={`flex-1 overflow-auto p-6 h-[calc(100vh-4rem)] transition-all duration-300 ${
+            isNavVisible ? "ml-64" : "ml-0"
+          }`}
+        >
+          <div className="flex items-center gap-2 mb-8 ">
             <div className="bg-blue-200 rounded-md p-1">
               <LayoutDashboard size={30} />
             </div>

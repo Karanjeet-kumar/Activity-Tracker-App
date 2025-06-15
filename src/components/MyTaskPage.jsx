@@ -33,8 +33,10 @@ import {
 } from "./ui/dialog";
 import TaskForm from "./TaskForm";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { useNav } from "./context/NavContext";
 
 function MyTaskPage() {
+  const { isNavVisible } = useNav();
   const { loggedUser } = useSelector((store) => store.auth);
   const [loading, setLoading] = useState(true);
   const [showUpdateBox, setShowUpdateBox] = useState(null);
@@ -583,7 +585,11 @@ function MyTaskPage() {
       <Navbar />
       <div className="flex h-screen">
         <Nav />
-        <div className="flex-1 overflow-auto p-6">
+        <div
+          className={`flex-1 overflow-auto p-6 h-[calc(100vh-4rem)] transition-all duration-300 ${
+            isNavVisible ? "ml-64" : "ml-0"
+          }`}
+        >
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-2 ">
               <div className="bg-blue-200 rounded-md p-1">

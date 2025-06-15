@@ -130,3 +130,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background-size: cover;
   background-position: center;
 }
+
+body {
+  overflow: hidden;
+  height: 100%;
+}

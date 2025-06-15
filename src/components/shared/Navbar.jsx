@@ -43,7 +43,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-500 to-blue-900 text-white">
+    <div className="bg-gradient-to-r from-blue-500 to-blue-900 text-white sticky top-0 z-50">
       <div className="flex items-center justify-between mx-4 max-w-7xl h-16">
         <div
           className="flex items-center gap-3 cursor-pointer"
