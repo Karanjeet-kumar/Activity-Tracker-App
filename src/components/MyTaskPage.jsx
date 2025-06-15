@@ -32,6 +32,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import TaskForm from "./TaskForm";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
 function MyTaskPage() {
   const { loggedUser } = useSelector((store) => store.auth);
@@ -46,6 +47,16 @@ function MyTaskPage() {
 
   // UseLoadTaskPage();
   const { refresh } = useGetAllAssignedTasks();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      refresh(searchTerm, statusFilter); // pass activityName, status left empty
+    }, 500); // adjust debounce time as needed
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, statusFilter, refresh]);
 
   useEffect(() => {
     if (loggedUser) {
@@ -609,6 +620,55 @@ function MyTaskPage() {
             </div>
           </div>
 
+          {/* Status Filter Tabs */}
+          <div className="mb-6">
+            <Tabs
+              value={statusFilter}
+              onValueChange={(value) => {
+                setStatusFilter(value);
+              }}
+            >
+              <TabsList className="grid grid-cols-4 w-full gap-2 bg-cyan-300">
+                <TabsTrigger
+                  value=""
+                  className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
+                >
+                  All
+                </TabsTrigger>
+                <TabsTrigger
+                  value="2"
+                  className="bg-white hover:bg-blue-200 data-[state=active]:bg-blue-400"
+                >
+                  Open
+                </TabsTrigger>
+                <TabsTrigger
+                  value="3"
+                  className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
+                >
+                  In Progress
+                </TabsTrigger>
+                {/* <TabsTrigger
+                  value="7"
+                  className="bg-white hover:bg-red-200 data-[state=active]:bg-red-400"
+                >
+                  Rejected
+                </TabsTrigger> */}
+                <TabsTrigger
+                  value="5"
+                  className="bg-white hover:bg-green-200 data-[state=active]:bg-green-400"
+                >
+                  Completed
+                </TabsTrigger>
+                {/* <TabsTrigger
+                  value="6"
+                  className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
+                >
+                  Closed
+                </TabsTrigger> */}
+              </TabsList>
+            </Tabs>
+          </div>
+
           <div className="mb-2">
             <h1 className="text-lg font-bold">Tasks I've Assigned</h1>
           </div>
@@ -619,6 +679,8 @@ function MyTaskPage() {
               <Input
                 placeholder="Search your tasks..."
                 className="pl-10 py-3 text-md"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
