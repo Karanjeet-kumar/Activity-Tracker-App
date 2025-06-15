@@ -20,7 +20,7 @@ export default function useLoadVerifierPage() {
 
     let retried = false;
 
-    // API(GetAllAssigned_TASK_API)--->Connected
+    // API(GetAllVerifierActivities_API)--->Connected
     try {
       const accessToken = localStorage.getItem("access_token");
 
