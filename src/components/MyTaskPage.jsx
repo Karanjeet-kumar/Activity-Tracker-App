@@ -59,7 +59,14 @@ function MyTaskPage() {
         <Navbar />
         <div className="flex h-screen">
           <Nav />
-          <div className="flex-1 overflow-auto p-6">Loading...</div>
+          <div className="flex-1 overflow-auto p-6">
+            <div className="flex items-center justify-center max-h-[300px] h-[300px]">
+              <div className="flex flex-col items-center space-y-3">
+                <div className="border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full w-12 h-12 animate-spin"></div>
+                <p className="text-muted-foreground">Loading tasks...</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
