@@ -298,7 +298,7 @@ function MyTaskPage() {
                         setRemarks("");
                         setTaskFilter("all");
                       }}
-                      disabled={task.Status === "Completed"}
+                      disabled={["Completed", "Verified"].includes(task.Status)}
                     >
                       {showUpdateBox === task.TaskId ? "✕ Cancel" : "Update"}
                     </Button>
@@ -314,6 +314,8 @@ function MyTaskPage() {
                         ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
                         : task.Status === "InProgress"
                         ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
+                        : task.Status === "Verified"
+                        ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 text-orange-800"
                         : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
                     }`}
                   >
@@ -388,6 +390,8 @@ function MyTaskPage() {
                       ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 "
                       : task.Status === "InProgress"
                       ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 "
+                      : task.Status === "Verified"
+                      ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 "
                       : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 "
                   }`}
                 >
@@ -463,6 +467,8 @@ function MyTaskPage() {
                         ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
                         : task.Status === "InProgress"
                         ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
+                        : task.Status === "Verified"
+                        ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 text-yellow-800"
                         : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
                     }`}
                   >
@@ -507,7 +513,9 @@ function MyTaskPage() {
                           setRemarks("");
                           setTaskFilter("all");
                         }}
-                        disabled={task.Status === "Completed"}
+                        disabled={["Completed", "Verified"].includes(
+                          task.Status
+                        )}
                       >
                         Update
                       </Button>
@@ -634,7 +642,7 @@ function MyTaskPage() {
                 setStatusFilter(value);
               }}
             >
-              <TabsList className="grid grid-cols-4 w-full gap-2 bg-cyan-300">
+              <TabsList className="grid grid-cols-5 w-full gap-2 bg-cyan-300">
                 <TabsTrigger
                   value=""
                   className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
@@ -665,12 +673,12 @@ function MyTaskPage() {
                 >
                   Completed
                 </TabsTrigger>
-                {/* <TabsTrigger
-                  value="6"
+                <TabsTrigger
+                  value="8"
                   className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
                 >
-                  Closed
-                </TabsTrigger> */}
+                  Verified
+                </TabsTrigger>
               </TabsList>
             </Tabs>
           </div>

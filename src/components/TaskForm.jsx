@@ -123,7 +123,7 @@ const TaskForm = ({ task }) => {
           onClick={() => {
             setShowAssignBox(task.TaskId);
           }}
-          disabled={task.Status === "Completed"}
+          disabled={["Completed", "Verified"].includes(task.Status)}
         >
           Assign
         </Button>

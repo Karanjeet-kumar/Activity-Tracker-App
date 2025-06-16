@@ -13,10 +13,18 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import useGetAllVerifierActivities from "./hooks/useGetAllVerifierActivities";
+import { useNav } from "./context/NavContext";
+import { ADD_ACTIVITY_UPDATE_API } from "./utils/api_const";
+import axios from "axios";
+import { toast } from "sonner";
+// import { Textarea } from "./ui/textarea";
 
 function MyReviewPage() {
+  const { isNavVisible } = useNav();
   const { loggedUser } = useSelector((store) => store.auth);
   const [loading, setLoading] = useState(true);
+  //   const [showRejectComment, setShowRejectComment] = useState(null);
+  //   const [rejectComment, setRejectComment] = useState("");
   const { allVerifierActivity } = useSelector((store) => store.activity);
 
   // +++ ADDED VIEW STATE +++
@@ -50,6 +58,48 @@ function MyReviewPage() {
     );
   }
 
+  const handleVerify = async (activity) => {
+    try {
+      await axios.post(ADD_ACTIVITY_UPDATE_API, {
+        activity_id: activity.ActivityId,
+        action_by: loggedUser.user_id,
+        ActionOn: new Date(
+          new Date().getTime() - new Date().getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .slice(0, -1),
+        action_status: 8,
+      });
+      // Optionally refetch activities or update local state
+      await refresh();
+      toast.success("Activity Verified Successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to verify activity.");
+    }
+  };
+
+  //   const handleReject = async (activity, comment) => {
+  //     // API(UPDATE_TRN_ACTIVITY_API)--->Connected
+  //     try {
+  //       const res = await axios.put(
+  //         `${TRN_ACTIVITY_API_END_POINT}/update/${activity.ActivityId}/`,
+  //         {
+  //           Acceptance: "No",
+  //           ActionBy: loggedUser.user_id,
+  //           Comments: comment,
+  //         }
+  //       );
+  //       // Optionally refetch activities or update local state
+  //       await refresh();
+  //       toast.success("Activity rejected!");
+  //     } catch (error) {
+  //       console.error(error);
+  //       toast.error("Failed to reject activity.");
+  //     }
+  //   };
+
+  // +++ CONDITIONAL RENDERING FOR ACTIVITIES +++
   const renderActivities = () => {
     if (allVerifierActivity?.length === 0) {
       return (
@@ -93,15 +143,56 @@ function MyReviewPage() {
                   <div className="flex gap-1">
                     <Button
                       size="sm"
-                      className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700"
-                      // onClick={() => handleVerify(act)}
+                      className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      // onClick={() => {
+                      //   toast.success("Are you sure you want to verify?", {
+                      //     action: {
+                      //       label: "Confirm",
+                      //       onClick: () => handleVerify(act),
+                      //     },
+                      //   });
+                      // }}
+                      onClick={() => {
+                        const toastId = toast.success(
+                          "Are you sure you want to verify?",
+                          {
+                            description: (
+                              <div className="flex justify-end gap-2 mt-2">
+                                <Button
+                                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                  onClick={() => {
+                                    handleVerify(act);
+                                    toast.dismiss(toastId);
+                                  }}
+                                >
+                                  Confirm
+                                </Button>
+                                <Button
+                                  className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                  onClick={() => toast.dismiss(toastId)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            ),
+                            duration: 10000,
+                          }
+                        );
+                      }}
+                      disabled={act.task_status === "Verified"}
                     >
                       Verify
                     </Button>
                     <Button
                       size="sm"
-                      className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700"
-                      // onClick={() => handleReject(act)}
+                      className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      // onClick={() => {
+                      //   setShowRejectComment((prev) =>
+                      //     prev === act.ActivityId ? null : act.ActivityId
+                      //   );
+                      //   setRejectComment("");
+                      // }}
+                      disabled={act.task_status === "Verified"}
                     >
                       Reject
                     </Button>
@@ -112,14 +203,16 @@ function MyReviewPage() {
                 <div className="flex justify-between items-center">
                   <span
                     className={`text-xs px-1.5 py-0.5 rounded border ${
-                      act.Status === "Verified"
+                      act.task_status === "Verified"
                         ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
-                        : act.Status === "Rejected"
+                        : act.task_status === "Rejected"
                         ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
                         : "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
                     }`}
                   >
-                    Pending
+                    {act.task_status === "Completed"
+                      ? "Pending"
+                      : act.task_status}
                   </span>
                   <div>
                     <p className=" text-xs font-medium text-gray-700 mb-0.5">
@@ -131,6 +224,33 @@ function MyReviewPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Reject Comment Section */}
+                {/* {showRejectComment === act.ActivityId && (
+                  <div className="mt-2 p-2 bg-gray-50 rounded-md border border-gray-200">
+                    <div className="space-y-2">
+                      <textarea
+                        value={rejectComment}
+                        onChange={(e) => setRejectComment(e.target.value)}
+                        placeholder="Reason for rejection..."
+                        className="w-full p-1.5 text-xs border rounded focus:ring focus:ring-red-100 min-h-[60px]"
+                      />
+                      <div className="flex justify-end">
+                        <Button
+                          size="sm"
+                          className="h-7 px-3 text-xs bg-red-600 hover:bg-red-700"
+                          onClick={() => {
+                            handleReject(act, rejectComment);
+                            setRejectComment("");
+                            setShowRejectComment(null);
+                          }}
+                        >
+                          Confirm
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )} */}
               </CardHeader>
 
               <CardContent className="p-3 pt-0 space-y-2">
@@ -145,9 +265,9 @@ function MyReviewPage() {
 
                 <div
                   className={` rounded-2xl flex justify-between text-xs p-2 border ${
-                    act.Status === "Verified"
+                    act.task_status === "Verified"
                       ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 "
-                      : act.Status === "Rejected"
+                      : act.task_status === "Rejected"
                       ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 "
                       : "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 "
                   }`}
@@ -237,14 +357,16 @@ function MyReviewPage() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`text-xs font-medium px-2.5 py-0.5 rounded border ${
-                      act.Status === "Verified"
+                      act.task_status === "Verified"
                         ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
-                        : act.Status === "Rejected"
+                        : act.task_status === "Rejected"
                         ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
                         : "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
                     }`}
                   >
-                    Pending
+                    {act.task_status === "Completed"
+                      ? "Pending"
+                      : act.task_status}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -276,18 +398,82 @@ function MyReviewPage() {
                     <Button
                       size="sm"
                       className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer"
-                      // onClick={() => handleVerify(act)}
+                      onClick={() => {
+                        const toastId = toast.success(
+                          "Are you sure you want to verify?",
+                          {
+                            description: (
+                              <div className="flex justify-end gap-2 mt-2">
+                                <Button
+                                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                  onClick={() => {
+                                    handleVerify(act);
+                                    toast.dismiss(toastId);
+                                  }}
+                                >
+                                  Confirm
+                                </Button>
+                                <Button
+                                  className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                  onClick={() => toast.dismiss(toastId)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            ),
+                            duration: 10000,
+                          }
+                        );
+                      }}
+                      disabled={act.task_status === "Verified"}
                     >
                       Verify
                     </Button>
                     <Button
                       size="sm"
                       className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer"
-                      // onClick={() => handleReject()}
+                      // onClick={() => {
+                      //   setShowRejectComment((prev) =>
+                      //     prev === act.ActivityId ? null : act.ActivityId
+                      //   );
+                      //   setRejectComment("");
+                      // }}
+                      disabled={act.task_status === "Verified"}
                     >
+                      {/* {showRejectComment === act.ActivityId
+                          ? "✕ Cancel"
+                          : "Reject"} */}
                       Reject
                     </Button>
                   </div>
+                  {/* Reject Comment Section */}
+                  {/* {showRejectComment === act.ActivityId && (
+                      <div className="mt-3 space-y-2">
+                        <Textarea
+                          value={rejectComment}
+                          onChange={(e) => setRejectComment(e.target.value)}
+                          placeholder="Enter reason for rejection..."
+                          className="w-full p-2 border rounded-md focus:ring focus:ring-red-200 focus:border-red-500 min-h-[80px]"
+                        />
+                        <div className="flex justify-end">
+                          <Button
+                            size="sm"
+                            className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer"
+                            onClick={() => {
+                              if (rejectComment === "") {
+                                toast.error("Enter the reason to proceed...");
+                              } else {
+                                handleReject(act, rejectComment);
+                                setRejectComment("");
+                                setShowRejectComment(null);
+                              }
+                            }}
+                          >
+                            Confirm
+                          </Button>
+                        </div>
+                      </div>
+                    )} */}
                 </td>
               </tr>
             ))}
@@ -302,7 +488,11 @@ function MyReviewPage() {
       <Navbar />
       <div className="flex h-screen">
         <Nav />
-        <div className="flex-1 overflow-auto p-6">
+        <div
+          className={`flex-1 overflow-auto p-6 h-[calc(100vh-4rem)] transition-all duration-300 ${
+            isNavVisible ? "ml-64" : "ml-0"
+          }`}
+        >
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-2 ">
               <div className="bg-blue-200 rounded-md p-1">
@@ -311,7 +501,7 @@ function MyReviewPage() {
               <div>
                 <h1 className="text-2xl font-bold">Reviews</h1>
                 <h1 className="text-1xl text-gray-400 font-bold">
-                  Verify/Reject activities"
+                  Verify/Reject activities
                 </h1>
               </div>
             </div>
