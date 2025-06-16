@@ -60,6 +60,7 @@ function MyReviewPage() {
 
   const handleVerify = async (activity) => {
     try {
+      // API(ADD_TRN_ACTIVITY_UPDATE_API)--->Connected
       await axios.post(ADD_ACTIVITY_UPDATE_API, {
         activity_id: activity.ActivityId,
         action_by: loggedUser.user_id,

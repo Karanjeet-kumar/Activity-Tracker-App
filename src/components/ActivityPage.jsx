@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import Navbar from "./shared/Navbar";
 import Nav from "./shared/Nav";
 import {
+  AlarmClockPlus,
   CalendarDays,
   ClipboardList,
   LayoutGrid,
@@ -150,15 +151,19 @@ function ActivityPage() {
           {/* No Activities Section */}
           <div className="border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center space-y-4 bg-gray-200 hover:bg-gray-300 transition-colors cursor-pointer">
             <div className="bg-blue-100 rounded-full p-4">
-              <ClipboardList className="h-12 w-12 text-blue-600" />
+              {loggedUser?.isAdmin ? (
+                <ClipboardList className="h-12 w-12" size={30} />
+              ) : (
+                <AlarmClockPlus className="h-12 w-12" size={30} />
+              )}
             </div>
             <h3 className="text-2xl font-bold tracking-tight">
-              No activities found
+              {loggedUser?.isAdmin ? "No activities found" : "No tasks found"}
             </h3>
             <p className="text-gray-500 text-center max-w-md">
               {loggedUser?.isAdmin
                 ? "Get started by creating a new activity"
-                : "You don't have any assigned activities yet"}
+                : "You don't have any assigned tasks yet"}
             </p>
             {!!loggedUser?.isAdmin && <ActivityForm />}
           </div>
@@ -646,16 +651,20 @@ function ActivityPage() {
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-2 ">
               <div className="bg-blue-200 rounded-md p-1">
-                <ClipboardList className="text-blue-600" size={30} />
+                {loggedUser?.isAdmin ? (
+                  <ClipboardList className="text-blue-600" size={30} />
+                ) : (
+                  <AlarmClockPlus className="text-blue-600" size={30} />
+                )}
               </div>
               <div>
                 <h1 className="text-2xl font-bold">
-                  {loggedUser?.isAdmin ? "Activities" : "My Activities"}
+                  {loggedUser?.isAdmin ? "Activities" : "New Tasks"}
                 </h1>
                 <h1 className="text-1xl text-gray-400 font-bold">
                   {loggedUser?.isAdmin
                     ? "Manage and track all activities"
-                    : "Accept/Reject activities"}
+                    : "Accept/Reject tasks"}
                 </h1>
               </div>
             </div>
@@ -741,7 +750,7 @@ function ActivityPage() {
             <h1 className="text-lg font-bold">
               {loggedUser?.isAdmin
                 ? "Activities I've Created"
-                : "Activities Assigned To Me"}
+                : "Tasks Assigned To Me"}
             </h1>
           </div>
           <div className="mb-3 flex items-center">
@@ -749,7 +758,7 @@ function ActivityPage() {
             <div className="relative w-full max-w-6xl">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search activities..."
+                placeholder="Search tasks/activities..."
                 className="pl-10 py-3 text-md"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

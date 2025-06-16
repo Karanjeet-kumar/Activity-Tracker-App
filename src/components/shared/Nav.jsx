@@ -7,6 +7,7 @@ import {
   SquareCheckBig,
   LayoutDashboard,
   CopyCheck,
+  AlarmClockPlus,
 } from "lucide-react";
 import { useNav } from "../context/NavContext";
 import { useSelector } from "react-redux";
@@ -41,8 +42,12 @@ function Nav() {
               variant={activeNav === "/activities" ? "default" : "ghost"}
               className="w-full justify-start cursor-pointer"
             >
-              <ClipboardList className="mr-4" />
-              {loggedUser?.isAdmin ? "Activities" : "My Activities"}
+              {loggedUser?.isAdmin ? (
+                <ClipboardList className="mr-4" />
+              ) : (
+                <AlarmClockPlus className="mr-4" />
+              )}
+              {loggedUser?.isAdmin ? "Activities" : "New Tasks"}
             </Button>
           </Link>
         </div>
