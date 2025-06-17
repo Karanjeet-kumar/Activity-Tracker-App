@@ -139,6 +139,52 @@ function ActivityPage() {
     }
   };
 
+  const handleClose = async (act) => {
+    try {
+      // API(CLOSE_ACTIVITY_API)--->Connected
+      await axios.put(
+        `${TRN_ACTIVITY_API_END_POINT}/close/${act.ActivityId}/`,
+        {
+          status: 6,
+          ClosedOn: new Date(
+            new Date().getTime() - new Date().getTimezoneOffset() * 60000
+          )
+            .toISOString()
+            .slice(0, -1),
+        }
+      );
+      // Optionally refetch activities or update local state
+      await refresh(searchTerm, statusFilter);
+      toast.success("Activity Closed Successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to close activity.");
+    }
+  };
+
+  const handleForeClose = async (act) => {
+    try {
+      // API(CLOSE_ACTIVITY_API)--->Connected
+      await axios.put(
+        `${TRN_ACTIVITY_API_END_POINT}/close/${act.ActivityId}/`,
+        {
+          status: 11,
+          ClosedOn: new Date(
+            new Date().getTime() - new Date().getTimezoneOffset() * 60000
+          )
+            .toISOString()
+            .slice(0, -1),
+        }
+      );
+      // Optionally refetch activities or update local state
+      await refresh(searchTerm, statusFilter);
+      toast.success("Activity Closed Successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to close activity.");
+    }
+  };
+
   // +++ CONDITIONAL RENDERING FOR ACTIVITIES +++
   const renderActivities = () => {
     const activities = loggedUser?.isAdmin
@@ -173,128 +219,6 @@ function ActivityPage() {
 
     // Card View
     if (viewMode === "card") {
-      // return (
-      //   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3">
-      //     {activities.map((act) => (
-      //       <Card key={act.ActivityId}>
-      //         <CardHeader>
-      //           <div>
-      //             <div className="flex justify-between items-start">
-      //               <div>
-      //                 <CardTitle className="text-xl">{act.Category}</CardTitle>
-      //                 <p className="text-sm text-gray-500">
-      //                   {act.ActivityName}
-      //                 </p>
-      //               </div>
-      //               {!loggedUser.isAdmin && (
-      //                 <div className="flex gap-2">
-      //                   <Button
-      //                     className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded cursor-pointer"
-      //                     onClick={() => handleAccept(act)}
-      //                   >
-      //                     Accept
-      //                   </Button>
-      //                   <Button
-      //                     className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
-      //                     onClick={() => {
-      //                       setShowRejectComment((prev) =>
-      //                         prev === act.ActivityId ? null : act.ActivityId
-      //                       );
-      //                       setRejectComment("");
-      //                     }}
-      //                   >
-      //                     {showRejectComment === act.ActivityId
-      //                       ? "Cancel"
-      //                       : "Reject"}
-      //                   </Button>
-      //                 </div>
-      //               )}
-      //             </div>
-
-      //             {/* Reject Comment Section */}
-      //             {showRejectComment === act.ActivityId && (
-      //               <div className="mt-3 space-y-2">
-      //                 <textarea
-      //                   value={rejectComment}
-      //                   onChange={(e) => setRejectComment(e.target.value)}
-      //                   placeholder="Enter reason for rejection..."
-      //                   className="w-full p-2 border rounded-md focus:ring focus:ring-red-200 focus:border-red-500 min-h-[80px]"
-      //                 />
-      //                 <div className="flex justify-end">
-      //                   <Button
-      //                     className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded cursor-pointer"
-      //                     onClick={() => {
-      //                       handleReject(act, rejectComment);
-      //                       setRejectComment("");
-      //                       setShowRejectComment(null);
-      //                     }}
-      //                   >
-      //                     Confirm Reject
-      //                   </Button>
-      //                 </div>
-      //               </div>
-      //             )}
-      //           </div>
-      //         </CardHeader>
-
-      //         <CardContent className="space-y-5">
-      //           <div className="flex justify-between items-center">
-      //             {/* Status only shown for admin */}
-      //             {!!loggedUser.isAdmin && (
-      //               <div className="flex items-center space-x-2">
-      //                 <p>Status</p>
-      //                 <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">
-      //                   {act.Status}
-      //                 </span>
-      //               </div>
-      //             )}
-
-      //             <div className="text-sm">
-      //               <p>Due Date</p>
-      //               <div className="flex items-center text-sm text-gray-600">
-      //                 <CalendarDays className="h-4 w-4 mr-1" />
-      //                 <span>{act.TargetDate}</span>
-      //               </div>
-      //             </div>
-      //           </div>
-
-      //           <div>
-      //             <p className="text-sm font-semibold text-gray-800 mb-1">
-      //               Description
-      //             </p>
-      //             <p className="text-sm text-gray-700">{act.AdditionalNote}</p>
-      //           </div>
-
-      //           <div className="flex justify-between items-center pt-2 border-t">
-      //             <div>
-      //               <p className="text-xs text-gray-500">
-      //                 {loggedUser.isAdmin ? "Assigned To" : "Assigned By"}
-      //               </p>
-      //               {loggedUser.isAdmin ? (
-      //                 <>
-      //                   <p className="text-sm text-gray-800">
-      //                     {act.AssignedUserRole}-{act.AssignedUser}
-      //                   </p>
-      //                   <p className="text-sm text-gray-800">
-      //                     Dept-{act.Department}
-      //                   </p>
-      //                 </>
-      //               ) : (
-      //                 <p className="text-sm text-gray-800">{act.CreatedBy}</p>
-      //               )}
-      //             </div>
-
-      //             <div>
-      //               <p className="text-xs text-gray-500">Verifier</p>
-      //               <p className="text-sm text-gray-800">{act.Verifier}</p>
-      //             </div>
-      //           </div>
-      //         </CardContent>
-      //       </Card>
-      //     ))}
-      //   </div>
-      // );
-
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {activities.map((act) => (
@@ -313,7 +237,77 @@ function ActivityPage() {
                     </p>
                   </div>
 
-                  {!loggedUser.isAdmin && (
+                  {loggedUser.isAdmin ? (
+                    act.Status === "Completed" ? (
+                      <Button
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-gradient-to-r from-green-800 to-green-400 cursor-pointer"
+                        onClick={() => {
+                          const toastId = toast.success(
+                            "Are you sure you want to close this activity?",
+                            {
+                              description: (
+                                <div className="flex justify-end gap-2 mt-2">
+                                  <Button
+                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                    onClick={() => {
+                                      handleClose(act);
+                                      toast.dismiss(toastId);
+                                    }}
+                                  >
+                                    Confirm
+                                  </Button>
+                                  <Button
+                                    className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                    onClick={() => toast.dismiss(toastId)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              ),
+                              duration: 10000,
+                            }
+                          );
+                        }}
+                      >
+                        Close Activity
+                      </Button>
+                    ) : act.Status === "Rejected" ? (
+                      <Button
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-gradient-to-r from-green-800 to-green-400 cursor-pointer"
+                        onClick={() => {
+                          const toastId = toast.success(
+                            "Are you sure you want to close this activity?",
+                            {
+                              description: (
+                                <div className="flex justify-end gap-2 mt-2">
+                                  <Button
+                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                    onClick={() => {
+                                      handleForeClose(act);
+                                      toast.dismiss(toastId);
+                                    }}
+                                  >
+                                    Confirm
+                                  </Button>
+                                  <Button
+                                    className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                    onClick={() => toast.dismiss(toastId)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              ),
+                              duration: 10000,
+                            }
+                          );
+                        }}
+                      >
+                        ForeClose
+                      </Button>
+                    ) : null
+                  ) : (
                     <div className="flex gap-1">
                       <Button
                         size="sm"
@@ -560,11 +554,9 @@ function ActivityPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Verifier
               </th>
-              {!loggedUser.isAdmin && (
-                <th className="px-7 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                  Perform Action
-                </th>
-              )}
+              <th className="px-7 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
+                Perform Action
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -625,7 +617,81 @@ function ActivityPage() {
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {act.Verifier}
                 </td>
-                {!loggedUser.isAdmin && (
+                {loggedUser.isAdmin ? (
+                  act.Status === "Completed" ? (
+                    <td className="px-7 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <Button
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-gradient-to-r from-green-800 to-green-400 cursor-pointer"
+                        onClick={() => {
+                          const toastId = toast.success(
+                            "Are you sure you want to close this activity?",
+                            {
+                              description: (
+                                <div className="flex justify-end gap-2 mt-2">
+                                  <Button
+                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                    onClick={() => {
+                                      handleClose(act);
+                                      toast.dismiss(toastId);
+                                    }}
+                                  >
+                                    Confirm
+                                  </Button>
+                                  <Button
+                                    className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                    onClick={() => toast.dismiss(toastId)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              ),
+                              duration: 10000,
+                            }
+                          );
+                        }}
+                      >
+                        Close Activity
+                      </Button>
+                    </td>
+                  ) : act.Status === "Rejected" ? (
+                    <td className="px-7 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <Button
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-gradient-to-r from-green-800 to-green-400 cursor-pointer"
+                        onClick={() => {
+                          const toastId = toast.success(
+                            "Are you sure you want to close this activity?",
+                            {
+                              description: (
+                                <div className="flex justify-end gap-2 mt-2">
+                                  <Button
+                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                    onClick={() => {
+                                      handleForeClose(act);
+                                      toast.dismiss(toastId);
+                                    }}
+                                  >
+                                    Confirm
+                                  </Button>
+                                  <Button
+                                    className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                    onClick={() => toast.dismiss(toastId)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              ),
+                              duration: 10000,
+                            }
+                          );
+                        }}
+                      >
+                        ForeClose
+                      </Button>
+                    </td>
+                  ) : null
+                ) : (
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex gap-2">
                       <Button
@@ -804,7 +870,7 @@ function ActivityPage() {
                   setStatusFilter(value);
                 }}
               >
-                <TabsList className="grid grid-cols-6 w-full gap-2 bg-cyan-300">
+                <TabsList className="grid grid-cols-7 w-full gap-2 bg-cyan-300">
                   <TabsTrigger
                     value=""
                     className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
@@ -840,6 +906,12 @@ function ActivityPage() {
                     className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
                   >
                     Closed
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="11"
+                    className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
+                  >
+                    ForeClosed
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
