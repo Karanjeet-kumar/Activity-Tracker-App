@@ -318,7 +318,33 @@ function ActivityPage() {
                       <Button
                         size="sm"
                         className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer"
-                        onClick={() => handleAccept(act)}
+                        onClick={() => {
+                          const toastId = toast.success(
+                            "Are you sure you want to accept?",
+                            {
+                              description: (
+                                <div className="flex justify-end gap-2 mt-2">
+                                  <Button
+                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                    onClick={() => {
+                                      handleAccept(act);
+                                      toast.dismiss(toastId);
+                                    }}
+                                  >
+                                    Confirm
+                                  </Button>
+                                  <Button
+                                    className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                    onClick={() => toast.dismiss(toastId)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              ),
+                              duration: 10000,
+                            }
+                          );
+                        }}
                       >
                         Accept
                       </Button>
@@ -386,9 +412,33 @@ function ActivityPage() {
                             if (rejectComment === "") {
                               toast.error("Enter the reason to proceed...");
                             } else {
-                              handleReject(act, rejectComment);
-                              setRejectComment("");
-                              setShowRejectComment(null);
+                              const toastId = toast.error(
+                                "Are you sure you want to reject?",
+                                {
+                                  description: (
+                                    <div className="flex justify-end gap-2 mt-2">
+                                      <Button
+                                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                        onClick={() => {
+                                          handleReject(act, rejectComment);
+                                          setRejectComment("");
+                                          setShowRejectComment(null);
+                                          toast.dismiss(toastId);
+                                        }}
+                                      >
+                                        Confirm
+                                      </Button>
+                                      <Button
+                                        className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                        onClick={() => toast.dismiss(toastId)}
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  ),
+                                  duration: 10000,
+                                }
+                              );
                             }
                           }}
                         >
@@ -581,7 +631,33 @@ function ActivityPage() {
                       <Button
                         size="sm"
                         className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer"
-                        onClick={() => handleAccept(act)}
+                        onClick={() => {
+                          const toastId = toast.success(
+                            "Are you sure you want to accept?",
+                            {
+                              description: (
+                                <div className="flex justify-end gap-2 mt-2">
+                                  <Button
+                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                    onClick={() => {
+                                      handleAccept(act);
+                                      toast.dismiss(toastId);
+                                    }}
+                                  >
+                                    Confirm
+                                  </Button>
+                                  <Button
+                                    className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                    onClick={() => toast.dismiss(toastId)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              ),
+                              duration: 10000,
+                            }
+                          );
+                        }}
                       >
                         Accept
                       </Button>
@@ -617,9 +693,33 @@ function ActivityPage() {
                               if (rejectComment === "") {
                                 toast.error("Enter the reason to proceed...");
                               } else {
-                                handleReject(act, rejectComment);
-                                setRejectComment("");
-                                setShowRejectComment(null);
+                                const toastId = toast.error(
+                                  "Are you sure you want to reject?",
+                                  {
+                                    description: (
+                                      <div className="flex justify-end gap-2 mt-2">
+                                        <Button
+                                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                          onClick={() => {
+                                            handleReject(act, rejectComment);
+                                            setRejectComment("");
+                                            setShowRejectComment(null);
+                                            toast.dismiss(toastId);
+                                          }}
+                                        >
+                                          Confirm
+                                        </Button>
+                                        <Button
+                                          className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                          onClick={() => toast.dismiss(toastId)}
+                                        >
+                                          Cancel
+                                        </Button>
+                                      </div>
+                                    ),
+                                    duration: 10000,
+                                  }
+                                );
                               }
                             }}
                           >
