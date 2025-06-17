@@ -81,6 +81,7 @@ function MyReviewPage() {
   };
 
   const handleReturn = async (activity, comment) => {
+    // API(ADD_ACTIVITY_UPDATE_API)--->Connected
     try {
       await axios.post(ADD_ACTIVITY_UPDATE_API, {
         activity_id: activity.ActivityId,
