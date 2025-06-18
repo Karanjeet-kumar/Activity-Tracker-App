@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { Textarea } from "./ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useNav } from "./context/NavContext";
+import ActivityInfo from "./ActivityInfo";
 
 function ActivityPage() {
   const { isNavVisible } = useNav();
@@ -363,19 +364,22 @@ function ActivityPage() {
                 {/* Status and Dates */}
                 <div className="flex justify-between items-center">
                   {!!loggedUser.isAdmin && (
-                    <span
-                      className={`text-xs px-1.5 py-0.5 rounded border ${
-                        act.Status === "Completed"
-                          ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
-                          : act.Status === "InProgress"
-                          ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
-                          : act.Status === "Rejected"
-                          ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
-                          : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
-                      }`}
-                    >
-                      {act.Status}
-                    </span>
+                    <div className="flex justify-between items-center gap-2">
+                      <span
+                        className={`flex justify-between items-center gap-2 text-xs px-1.5 py-0.5 rounded border ${
+                          act.Status === "Completed"
+                            ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
+                            : act.Status === "InProgress"
+                            ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
+                            : act.Status === "Rejected"
+                            ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
+                            : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
+                        }`}
+                      >
+                        {act.Status}
+                      </span>
+                      <ActivityInfo activity={act} />
+                    </div>
                   )}
                   <div>
                     <p className=" text-xs font-medium text-gray-700 mb-0.5">
