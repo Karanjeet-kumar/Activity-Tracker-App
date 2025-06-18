@@ -13,3 +13,4 @@ export const ADD_TASK_API = `${BASE_API_URL}/add/task/`;
 export const TASK_API_END_POINT = `${BASE_API_URL}/tasks`;
 export const ADD_TASK_UPDATE_API = `${BASE_API_URL}/add/task-updates/`;
 export const ADD_ACTIVITY_UPDATE_API = `${BASE_API_URL}/add/activity-updates/`;
+export const ACTIVITY_INFO_API_END_POINT = `${BASE_API_URL}/activityInfo`;
