@@ -42,15 +42,7 @@ function ActivityInfo({ activity }) {
       >
         <DialogTrigger asChild>
           <span
-            className={`text-white flex justify-between items-center gap-2 text-xs px-1.5 py-0.5 rounded border cursor-pointer ${
-              activity.Status === "Completed"
-                ? "bg-gradient-to-r from-green-800 to-green-400 border-green-800 "
-                : activity.Status === "InProgress"
-                ? "bg-gradient-to-r from-yellow-800 to-yellow-400 border-yellow-800 "
-                : activity.Status === "Rejected"
-                ? "bg-gradient-to-r from-red-800 to-red-400 border-red-800 "
-                : "bg-gradient-to-r from-blue-800 to-blue-400 border-blue-800 "
-            }`}
+            className="text-black flex justify-between items-center gap-2 text-xs px-1.5 py-0.5 rounded border cursor-pointer   bg-gradient-to-r from-gray-400 to-gray-200 border-gray-800"
             onClick={() => {
               setShowInfoBox(activity.ActivityId);
               activityHandler(activity);
@@ -115,7 +107,7 @@ function ActivityInfo({ activity }) {
                           >
                             <CardContent className="p-4">
                               <div className="grid grid-cols-2 gap-2">
-                                <div>
+                                <div className="flex items-center gap-3">
                                   <p className="text-sm font-medium text-gray-600">
                                     Action
                                   </p>
@@ -123,11 +115,13 @@ function ActivityInfo({ activity }) {
                                     {update.actionStatus}
                                   </p>
                                 </div>
-                                <div>
+                                <div className="flex items-center gap-3">
                                   <p className="text-sm font-medium text-gray-600">
                                     By
                                   </p>
-                                  <p>{update.actionBy}</p>
+                                  <p className="font-semibold">
+                                    {update.actionBy}
+                                  </p>
                                 </div>
                                 <div>
                                   <p className="text-sm font-medium text-gray-600">

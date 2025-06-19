@@ -49,8 +49,10 @@ const TaskItem = ({ task, level, openTasks, setOpenTasks }) => {
             )}
           </div>
           <div>
-            <h4 className="font-semibold"> {task.description}</h4>
-            <div className="flex gap-2 mt-1">
+            <div className="flex items-center gap-2">
+              <h4 className="font-semibold">
+                {task.description || task.taskName}
+              </h4>
               <Badge
                 variant={task.status === "Verified" ? "secondary" : "outline"}
                 className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
@@ -65,10 +67,24 @@ const TaskItem = ({ task, level, openTasks, setOpenTasks }) => {
               >
                 Status: {task.status}
               </Badge>
-              <Badge variant="secondary">
-                {new Date(task.assignedOn).toLocaleDateString()}
+            </div>
+
+            <div className="flex gap-2 mt-1">
+              <Badge className="bg-gray-200" variant="secondary">
+                AssignedOn: {new Date(task.assignedOn).toLocaleDateString()}
               </Badge>
-              <Badge variant="secondary">{task.assignedTo}</Badge>
+              <Badge className="bg-gray-200" variant="secondary">
+                {task.assignedTo}
+              </Badge>
+              {level > 0 ? (
+                <Badge className="bg-gray-200" variant="secondary">
+                  EMPLOYEE
+                </Badge>
+              ) : (
+                <Badge className="bg-gray-200" variant="secondary">
+                  HOD
+                </Badge>
+              )}
             </div>
           </div>
         </div>

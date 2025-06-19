@@ -18,6 +18,7 @@ import { ADD_ACTIVITY_UPDATE_API } from "./utils/api_const";
 import axios from "axios";
 import { toast } from "sonner";
 import { Textarea } from "./ui/textarea";
+import ActivityInfo from "./ActivityInfo";
 
 function MyReviewPage() {
   const { isNavVisible } = useNav();
@@ -140,7 +141,7 @@ function MyReviewPage() {
                       {act.ActivityName}
                     </CardTitle>
                     <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
-                      {act.CategoryName}
+                      {act.Category}
                     </p>
                   </div>
 
@@ -207,17 +208,20 @@ function MyReviewPage() {
 
                 {/* Status and Dates */}
                 <div className="flex justify-between items-center">
-                  <span
-                    className={`text-xs px-1.5 py-0.5 rounded border ${
-                      act.task_status === "Verified"
-                        ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
-                        : "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
-                    }`}
-                  >
-                    {act.task_status === "Completed"
-                      ? "Pending"
-                      : act.task_status}
-                  </span>
+                  <div className="flex justify-between items-center gap-2">
+                    <span
+                      className={`text-xs px-1.5 py-0.5 rounded border ${
+                        act.task_status === "Verified"
+                          ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
+                          : "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
+                      }`}
+                    >
+                      {act.task_status === "Completed"
+                        ? "Pending"
+                        : act.task_status}
+                    </span>
+                    <ActivityInfo activity={act} />
+                  </div>
                   <div>
                     <p className=" text-xs font-medium text-gray-700 mb-0.5">
                       Target Date
@@ -382,7 +386,7 @@ function MyReviewPage() {
                   {act.ActivityName}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {act.CategoryName}
+                  {act.Category}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
