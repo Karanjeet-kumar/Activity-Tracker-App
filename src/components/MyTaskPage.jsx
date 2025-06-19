@@ -34,6 +34,7 @@ import {
 import TaskForm from "./TaskForm";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { useNav } from "./context/NavContext";
+import TaskInfo from "./TaskInfo";
 
 function MyTaskPage() {
   const { isNavVisible } = useNav();
@@ -281,8 +282,8 @@ function MyTaskPage() {
             >
               <CardHeader className="p-3 space-y-2">
                 <div className="flex justify-between items-center">
-                  <div className="max-w-[60%]">
-                    <CardTitle className="text-base font-medium text-gray-800 line-clamp-2">
+                  <div className="max-w-[70%]">
+                    <CardTitle className="text-base font-medium text-gray-800 ">
                       {task.TaskDescription}
                     </CardTitle>
                   </div>
@@ -308,19 +309,22 @@ function MyTaskPage() {
 
                 {/* Status and Dates */}
                 <div className="flex justify-between items-center">
-                  <span
-                    className={`text-xs px-1.5 py-0.5 rounded border ${
-                      task.Status === "Completed"
-                        ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
-                        : task.Status === "InProgress"
-                        ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
-                        : task.Status === "Verified"
-                        ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 text-orange-800"
-                        : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
-                    }`}
-                  >
-                    {task.Status}
-                  </span>
+                  <div className="flex justify-between items-center gap-2">
+                    <span
+                      className={`text-xs px-1.5 py-0.5 rounded border ${
+                        task.Status === "Completed"
+                          ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
+                          : task.Status === "InProgress"
+                          ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
+                          : task.Status === "Verified"
+                          ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 text-orange-800"
+                          : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
+                      }`}
+                    >
+                      {task.Status}
+                    </span>
+                    <TaskInfo task={task} />
+                  </div>
                   <div>
                     <p className=" text-xs font-medium text-gray-700 mb-0.5">
                       Target Date
@@ -343,7 +347,17 @@ function MyTaskPage() {
                         <SelectContent>
                           <SelectItem value="all">Select Status...</SelectItem>
                           <SelectItem value="3">In Progress</SelectItem>
-                          <SelectItem value="5">Completed</SelectItem>
+                          <SelectItem
+                            value="5"
+                            disabled={
+                              task.SubTaskStatuses?.length > 0 &&
+                              !task.SubTaskStatuses.every(
+                                (status) => status === "Completed"
+                              )
+                            }
+                          >
+                            Completed
+                          </SelectItem>
                         </SelectContent>
                       </Select>
 
@@ -568,9 +582,13 @@ function MyTaskPage() {
                           <Button
                             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded cursor-pointer"
                             onClick={() => {
-                              handleUpdate(task);
-                              setRemarks("");
-                              setShowUpdateBox(null);
+                              if (taskFilter === "all") {
+                                toast.error("Select task status...");
+                              } else {
+                                handleUpdate(task);
+                                setRemarks("");
+                                setShowUpdateBox(null);
+                              }
                             }}
                           >
                             Confirm Update
