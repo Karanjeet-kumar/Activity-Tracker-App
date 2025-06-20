@@ -35,6 +35,8 @@ import TaskForm from "./TaskForm";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { useNav } from "./context/NavContext";
 import TaskInfo from "./TaskInfo";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 function MyTaskPage() {
   const { isNavVisible } = useNav();
@@ -288,23 +290,29 @@ function MyTaskPage() {
                     </CardTitle>
                   </div>
 
-                  <div className="flex gap-1">
-                    <Button
-                      size="sm"
-                      className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => {
-                        setShowUpdateBox((prev) =>
-                          prev === task.TaskId ? null : task.TaskId
-                        );
-                        setRemarks("");
-                        setTaskFilter("all");
-                      }}
-                      disabled={["Completed", "Verified"].includes(task.Status)}
-                    >
-                      {showUpdateBox === task.TaskId ? "✕ Cancel" : "Update"}
-                    </Button>
-                    {!!loggedUser?.isHOD && <TaskForm task={task} />}
-                  </div>
+                  {!(
+                    task.Status === "Completed" || task.Status === "Verified"
+                  ) && (
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => {
+                          setShowUpdateBox((prev) =>
+                            prev === task.TaskId ? null : task.TaskId
+                          );
+                          setRemarks("");
+                          setTaskFilter("all");
+                        }}
+                        // disabled={["Completed", "Verified"].includes(
+                        //   task.Status
+                        // )}
+                      >
+                        {showUpdateBox === task.TaskId ? "✕ Cancel" : "Update"}
+                      </Button>
+                      {!!loggedUser?.isHOD && <TaskForm task={task} />}
+                    </div>
+                  )}
                 </div>
 
                 {/* Status and Dates */}
@@ -318,6 +326,8 @@ function MyTaskPage() {
                           ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
                           : task.Status === "Verified"
                           ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 text-orange-800"
+                          : task.Status === "ReOpen"
+                          ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
                           : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
                       }`}
                     >
@@ -347,17 +357,33 @@ function MyTaskPage() {
                         <SelectContent>
                           <SelectItem value="all">Select Status...</SelectItem>
                           <SelectItem value="3">In Progress</SelectItem>
-                          <SelectItem
-                            value="5"
-                            disabled={
-                              task.SubTaskStatuses?.length > 0 &&
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div>
+                                  <SelectItem
+                                    value="5"
+                                    disabled={
+                                      task.SubTaskStatuses?.length > 0 &&
+                                      !task.SubTaskStatuses.every(
+                                        (status) => status === "Completed"
+                                      )
+                                    }
+                                  >
+                                    Completed
+                                  </SelectItem>
+                                </div>
+                              </TooltipTrigger>
+                              {task.SubTaskStatuses?.length > 0 &&
                               !task.SubTaskStatuses.every(
                                 (status) => status === "Completed"
-                              )
-                            }
-                          >
-                            Completed
-                          </SelectItem>
+                              ) ? (
+                                <TooltipContent side="right">
+                                  <p>Subtask is not completed yet..</p>
+                                </TooltipContent>
+                              ) : null}
+                            </Tooltip>
+                          </TooltipProvider>
                         </SelectContent>
                       </Select>
 
@@ -406,6 +432,8 @@ function MyTaskPage() {
                       ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 "
                       : task.Status === "Verified"
                       ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 "
+                      : task.Status === "ReOpen"
+                      ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 "
                       : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 "
                   }`}
                 >
@@ -464,7 +492,7 @@ function MyTaskPage() {
                 Verifier
               </th>
               <th className="px-7 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                Action
+                Perform Action
               </th>
             </tr>
           </thead>
@@ -483,6 +511,8 @@ function MyTaskPage() {
                         ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
                         : task.Status === "Verified"
                         ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 text-yellow-800"
+                        : task.Status === "ReOpen"
+                        ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
                         : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
                     }`}
                   >
@@ -511,94 +541,128 @@ function MyTaskPage() {
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {task.Verifier}
                 </td>
-                <td className="px-4 py-4 flex gap-2 whitespace-nowrap text-sm text-gray-500">
-                  <Dialog
-                    open={showUpdateBox === task.TaskId}
-                    onOpenChange={(isOpen) => {
-                      if (!isOpen) setShowUpdateBox(null);
-                    }}
-                  >
-                    <DialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                        onClick={() => {
-                          setShowUpdateBox(task.TaskId);
-                          setRemarks("");
-                          setTaskFilter("all");
-                        }}
-                        disabled={["Completed", "Verified"].includes(
-                          task.Status
-                        )}
-                      >
-                        Update
-                      </Button>
-                    </DialogTrigger>
+                {!(
+                  task.Status === "Completed" || task.Status === "Verified"
+                ) ? (
+                  <td className="px-4 py-4 flex gap-2 whitespace-nowrap text-sm text-gray-500">
+                    <Dialog
+                      open={showUpdateBox === task.TaskId}
+                      onOpenChange={(isOpen) => {
+                        if (!isOpen) setShowUpdateBox(null);
+                      }}
+                    >
+                      <DialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={() => {
+                            setShowUpdateBox(task.TaskId);
+                            setRemarks("");
+                            setTaskFilter("all");
+                          }}
+                          // disabled={["Completed", "Verified"].includes(
+                          //   task.Status
+                          // )}
+                        >
+                          Update
+                        </Button>
+                      </DialogTrigger>
 
-                    <DialogContent className="sm:max-w-2xl">
-                      <DialogHeader>
-                        <DialogTitle>Update Task</DialogTitle>
-                      </DialogHeader>
+                      <DialogContent className="sm:max-w-2xl">
+                        <DialogHeader>
+                          <DialogTitle>Update Task</DialogTitle>
+                        </DialogHeader>
 
-                      <div className="space-y-4 py-4">
-                        {/* Task Status Dropdown */}
-                        <div>
-                          <Select
-                            onValueChange={setTaskFilter}
-                            value={taskFilter}
-                          >
-                            <SelectTrigger className="w-full p-2 rounded-lg shadow-md border border-gray-300">
-                              <SelectValue placeholder="Select Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">
-                                Select Status...
-                              </SelectItem>
-                              <SelectItem value="3">In Progress</SelectItem>
-                              <SelectItem value="5">Completed</SelectItem>
-                            </SelectContent>
-                          </Select>
+                        <div className="space-y-4 py-4">
+                          {/* Task Status Dropdown */}
+                          <div>
+                            <Select
+                              onValueChange={setTaskFilter}
+                              value={taskFilter}
+                            >
+                              <SelectTrigger className="w-full p-2 rounded-lg shadow-md border border-gray-300">
+                                <SelectValue placeholder="Select Status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="all">
+                                  Select Status...
+                                </SelectItem>
+                                <SelectItem value="3">In Progress</SelectItem>
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div>
+                                        <SelectItem
+                                          value="5"
+                                          disabled={
+                                            task.SubTaskStatuses?.length > 0 &&
+                                            !task.SubTaskStatuses.every(
+                                              (status) => status === "Completed"
+                                            )
+                                          }
+                                        >
+                                          Completed
+                                        </SelectItem>
+                                      </div>
+                                    </TooltipTrigger>
+                                    {task.SubTaskStatuses?.length > 0 &&
+                                    !task.SubTaskStatuses.every(
+                                      (status) => status === "Completed"
+                                    ) ? (
+                                      <TooltipContent side="bottom">
+                                        <p>Subtask is not completed yet..</p>
+                                      </TooltipContent>
+                                    ) : null}
+                                  </Tooltip>
+                                </TooltipProvider>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Remarks Textarea */}
+                          <div>
+                            <Textarea
+                              value={remarks}
+                              onChange={(e) => setRemarks(e.target.value)}
+                              placeholder="Enter your remarks here..."
+                              className="w-full p-2 min-h-[80px]"
+                            />
+                          </div>
+
+                          {/* Confirm Button */}
+                          <div className="flex justify-end gap-2 pt-2">
+                            <Button
+                              variant="outline"
+                              onClick={() => setShowUpdateBox(null)}
+                              className="bg-slate-200 hover:bg-slate-400 text-black px-4 py-1.5 rounded cursor-pointer"
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded cursor-pointer"
+                              onClick={() => {
+                                if (taskFilter === "all") {
+                                  toast.error("Select task status...");
+                                } else {
+                                  handleUpdate(task);
+                                  setRemarks("");
+                                  setShowUpdateBox(null);
+                                }
+                              }}
+                            >
+                              Confirm Update
+                            </Button>
+                          </div>
                         </div>
-
-                        {/* Remarks Textarea */}
-                        <div>
-                          <Textarea
-                            value={remarks}
-                            onChange={(e) => setRemarks(e.target.value)}
-                            placeholder="Enter your remarks here..."
-                            className="w-full p-2 min-h-[80px]"
-                          />
-                        </div>
-
-                        {/* Confirm Button */}
-                        <div className="flex justify-end gap-2 pt-2">
-                          <Button
-                            variant="outline"
-                            onClick={() => setShowUpdateBox(null)}
-                            className="bg-slate-200 hover:bg-slate-400 text-black px-4 py-1.5 rounded cursor-pointer"
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded cursor-pointer"
-                            onClick={() => {
-                              if (taskFilter === "all") {
-                                toast.error("Select task status...");
-                              } else {
-                                handleUpdate(task);
-                                setRemarks("");
-                                setShowUpdateBox(null);
-                              }
-                            }}
-                          >
-                            Confirm Update
-                          </Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                  {!!loggedUser.isHOD && <TaskForm task={task} />}
-                </td>
+                      </DialogContent>
+                    </Dialog>
+                    {!!loggedUser.isHOD && <TaskForm task={task} />}
+                  </td>
+                ) : (
+                  <td className="px-7 py-4 flex gap-2 whitespace-nowrap text-sm text-gray-500">
+                    Task {task.Status}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -660,12 +724,18 @@ function MyTaskPage() {
                 setStatusFilter(value);
               }}
             >
-              <TabsList className="grid grid-cols-5 w-full gap-2 bg-cyan-300">
+              <TabsList className="grid grid-cols-6 w-full gap-2 bg-cyan-300">
                 <TabsTrigger
                   value=""
                   className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
                 >
                   All
+                </TabsTrigger>
+                <TabsTrigger
+                  value="3"
+                  className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
+                >
+                  In Progress
                 </TabsTrigger>
                 <TabsTrigger
                   value="2"
@@ -674,17 +744,11 @@ function MyTaskPage() {
                   Open
                 </TabsTrigger>
                 <TabsTrigger
-                  value="3"
-                  className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
-                >
-                  In Progress
-                </TabsTrigger>
-                {/* <TabsTrigger
-                  value="7"
+                  value="10"
                   className="bg-white hover:bg-red-200 data-[state=active]:bg-red-400"
                 >
-                  Rejected
-                </TabsTrigger> */}
+                  ReOpen
+                </TabsTrigger>
                 <TabsTrigger
                   value="5"
                   className="bg-white hover:bg-green-200 data-[state=active]:bg-green-400"

@@ -279,7 +279,7 @@ function ActivityPage() {
                         className="h-7 px-2 text-xs bg-gradient-to-r from-green-800 to-green-400 cursor-pointer"
                         onClick={() => {
                           const toastId = toast.success(
-                            "Are you sure you want to close this activity?",
+                            "Are you sure you want to confirm & close this activity?",
                             {
                               description: (
                                 <div className="flex justify-end gap-2 mt-2">
@@ -305,7 +305,7 @@ function ActivityPage() {
                           );
                         }}
                       >
-                        ForeClose
+                        Confirm Reject
                       </Button>
                     ) : null
                   ) : (
@@ -373,6 +373,9 @@ function ActivityPage() {
                             ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
                             : act.Status === "Rejected"
                             ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
+                            : act.Status === "Closed" ||
+                              act.Status === "ForeClose"
+                            ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 text-orange-800"
                             : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
                         }`}
                       >
@@ -466,6 +469,8 @@ function ActivityPage() {
                       ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800"
                       : act.Status === "Rejected"
                       ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800"
+                      : act.Status === "Closed" || act.Status === "ForeClose"
+                      ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 "
                       : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800"
                   }`}
                 >
@@ -582,6 +587,9 @@ function ActivityPage() {
                           ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
                           : act.Status === "Rejected"
                           ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
+                          : act.Status === "Closed" ||
+                            act.Status === "ForeClose"
+                          ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 text-orange-800"
                           : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
                       }`}
                     >
@@ -665,7 +673,7 @@ function ActivityPage() {
                         className="h-7 px-2 text-xs bg-gradient-to-r from-green-800 to-green-400 cursor-pointer"
                         onClick={() => {
                           const toastId = toast.success(
-                            "Are you sure you want to close this activity?",
+                            "Are you sure you want to confirm & close this activity?",
                             {
                               description: (
                                 <div className="flex justify-end gap-2 mt-2">
@@ -691,10 +699,14 @@ function ActivityPage() {
                           );
                         }}
                       >
-                        ForeClose
+                        Confirm Reject
                       </Button>
                     </td>
-                  ) : null
+                  ) : (
+                    <td className="px-7 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Activity {act.Status}
+                    </td>
+                  )
                 ) : (
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex gap-2">
@@ -882,23 +894,18 @@ function ActivityPage() {
                     All
                   </TabsTrigger>
                   <TabsTrigger
-                    value="1"
-                    className="bg-white hover:bg-blue-200 data-[state=active]:bg-blue-400"
-                  >
-                    New
-                  </TabsTrigger>
-                  <TabsTrigger
                     value="3"
                     className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
                   >
                     In Progress
                   </TabsTrigger>
                   <TabsTrigger
-                    value="7"
-                    className="bg-white hover:bg-red-200 data-[state=active]:bg-red-400"
+                    value="1"
+                    className="bg-white hover:bg-blue-200 data-[state=active]:bg-blue-400"
                   >
-                    Rejected
+                    New
                   </TabsTrigger>
+
                   <TabsTrigger
                     value="5"
                     className="bg-white hover:bg-green-200 data-[state=active]:bg-green-400"
@@ -916,6 +923,12 @@ function ActivityPage() {
                     className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
                   >
                     ForeClosed
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="7"
+                    className="bg-white hover:bg-red-200 data-[state=active]:bg-red-400"
+                  >
+                    Rejected <span className="text-xs">(Request)</span>
                   </TabsTrigger>
                 </TabsList>
               </Tabs>

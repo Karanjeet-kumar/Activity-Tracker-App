@@ -12,6 +12,12 @@ import axios from "axios";
 import TaskItem from "./TaskItem";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 // ActivityInfo Component
 function ActivityInfo({ activity }) {
@@ -41,16 +47,25 @@ function ActivityInfo({ activity }) {
         }}
       >
         <DialogTrigger asChild>
-          <span
-            className="text-black flex justify-between items-center gap-2 text-xs px-1.5 py-0.5 rounded border cursor-pointer   bg-gradient-to-r from-gray-400 to-gray-200 border-gray-800"
-            onClick={() => {
-              setShowInfoBox(activity.ActivityId);
-              activityHandler(activity);
-            }}
-          >
-            <RectangleEllipsis size={16} />
-            Info
-          </span>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <span
+                    className="text-black flex justify-between items-center gap-2 text-xs px-1.5 py-0.5 rounded border cursor-pointer   bg-gradient-to-r from-gray-400 to-gray-200 border-gray-800"
+                    onClick={() => {
+                      setShowInfoBox(activity.ActivityId);
+                      activityHandler(activity);
+                    }}
+                  >
+                    <RectangleEllipsis size={16} />
+                    Info
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>Track Activity</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </DialogTrigger>
         <DialogContent
           aria-describedby={undefined}
@@ -74,6 +89,9 @@ function ActivityInfo({ activity }) {
                         ? "bg-yellow-100 text-yellow-800"
                         : activity.Status === "Rejected"
                         ? "bg-red-100 text-red-800"
+                        : activity.Status === "Closed" ||
+                          activity.Status === "ForeClose"
+                        ? "bg-orange-100 text-orange-800"
                         : "bg-blue-100 text-blue-800"
                     }`}
                   >
