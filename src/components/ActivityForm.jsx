@@ -45,7 +45,7 @@ import {
 import { toast } from "sonner";
 
 // function ActivityForm() {
-function ActivityForm({ onActivityCreated }) {
+function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
   const { loggedUser } = useSelector((store) => store.auth);
   const {
     allCategories,
@@ -63,7 +63,7 @@ function ActivityForm({ onActivityCreated }) {
   // const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("category");
   const [customActivityName, setCustomActivityName] = useState("");
-  const [customActivityDesc, setCustomActivityDesc] = useState("");
+  // const [customActivityDesc, setCustomActivityDesc] = useState("");
   const [userRole, setUserRole] = useState("hod");
   const [searchTerm, setSearchTerm] = useState("");
   const [deptFilter, setDeptFilter] = useState("");
@@ -136,7 +136,7 @@ function ActivityForm({ onActivityCreated }) {
       dispatch(setAllActivities([]));
       dispatch(setSelectedActivity(""));
       setCustomActivityName("");
-      setCustomActivityDesc("");
+      // setCustomActivityDesc("");
       setUserRole("hod");
       dispatch(setAllUsers([]));
       dispatch(setAssignedUser(""));
@@ -173,7 +173,8 @@ function ActivityForm({ onActivityCreated }) {
 
         // Call the refresh callback if provided
         if (onActivityCreated) {
-          await onActivityCreated();
+          await onActivityCreated("", "1");
+          setStatusFilter("1");
         }
       } else {
         toast.error("Activity Creation Failed");
@@ -330,7 +331,7 @@ function ActivityForm({ onActivityCreated }) {
                   />
                 </div>
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label>Activity Description</Label>
                   <Textarea
                     placeholder="Enter activity description"
@@ -338,7 +339,7 @@ function ActivityForm({ onActivityCreated }) {
                     onChange={(e) => setCustomActivityDesc(e.target.value)}
                     rows={3}
                   />
-                </div>
+                </div> */}
 
                 <div className="flex justify-end gap-2">
                   <Button
@@ -356,7 +357,7 @@ function ActivityForm({ onActivityCreated }) {
                         dispatch(
                           setSelectedActivity({
                             activity_name: customActivityName,
-                            activity_desc: customActivityDesc,
+                            // activity_desc: customActivityDesc,
                           })
                         );
                         handleUsers(`${loggedUser.locationId}`, userRole);

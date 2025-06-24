@@ -212,7 +212,13 @@ function ActivityPage() {
                 ? "Get started by creating a new activity"
                 : "You don't have any assigned tasks yet"}
             </p>
-            {!!loggedUser?.isAdmin && <ActivityForm />}
+            {!!loggedUser?.isAdmin && (
+              <ActivityForm
+                onActivityCreated={refresh}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+              />
+            )}
           </div>
         </div>
       );
@@ -872,7 +878,11 @@ function ActivityPage() {
                 </button>
               </div>
               {!!loggedUser.isAdmin && (
-                <ActivityForm onActivityCreated={refresh} />
+                <ActivityForm
+                  onActivityCreated={refresh}
+                  statusFilter={statusFilter}
+                  setStatusFilter={setStatusFilter}
+                />
               )}
             </div>
           </div>
@@ -886,15 +896,15 @@ function ActivityPage() {
                   setStatusFilter(value);
                 }}
               >
-                <TabsList className="grid grid-cols-7 w-full gap-2 bg-cyan-300">
-                  <TabsTrigger
+                <TabsList className="grid grid-cols-6 w-full gap-2 bg-cyan-300">
+                  {/* <TabsTrigger
                     value=""
                     className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
                   >
                     All
-                  </TabsTrigger>
+                  </TabsTrigger> */}
                   <TabsTrigger
-                    value="3"
+                    value=""
                     className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
                   >
                     In Progress

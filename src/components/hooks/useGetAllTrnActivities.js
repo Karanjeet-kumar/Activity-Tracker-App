@@ -33,7 +33,9 @@ const useGetAllTrnActivities = () => {
         // Prepare query params
         const queryParams = new URLSearchParams();
         if (activityName) queryParams.append("activity_name", activityName);
-        if (status) queryParams.append("status", status);
+        if (status !== undefined && status !== null && status !== "") {
+          queryParams.append("status", status);
+        }
 
         const res = await axios.get(
           `${TRN_ACTIVITY_API_END_POINT}/admin/${adminId}/?${queryParams.toString()}`

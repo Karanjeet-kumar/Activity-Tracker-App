@@ -104,7 +104,7 @@ function MyTaskPage() {
         Remarks: remarks,
       });
       // Optionally refetch activities or update local state
-      await refresh();
+      await refresh(searchTerm, statusFilter);
       toast.success("Task Updated Successfully");
     } catch (error) {
       console.error(error);
@@ -310,7 +310,14 @@ function MyTaskPage() {
                       >
                         {showUpdateBox === task.TaskId ? "✕ Cancel" : "Update"}
                       </Button>
-                      {!!loggedUser?.isHOD && <TaskForm task={task} />}
+                      {!!loggedUser?.isHOD && (
+                        <TaskForm
+                          task={task}
+                          refresh={refresh}
+                          search={searchTerm}
+                          filter={statusFilter}
+                        />
+                      )}
                     </div>
                   )}
                 </div>
@@ -656,7 +663,14 @@ function MyTaskPage() {
                         </div>
                       </DialogContent>
                     </Dialog>
-                    {!!loggedUser.isHOD && <TaskForm task={task} />}
+                    {!!loggedUser.isHOD && (
+                      <TaskForm
+                        task={task}
+                        refresh={refresh}
+                        search={searchTerm}
+                        filter={statusFilter}
+                      />
+                    )}
                   </td>
                 ) : (
                   <td className="px-7 py-4 flex gap-2 whitespace-nowrap text-sm text-gray-500">
@@ -724,24 +738,24 @@ function MyTaskPage() {
                 setStatusFilter(value);
               }}
             >
-              <TabsList className="grid grid-cols-6 w-full gap-2 bg-cyan-300">
-                <TabsTrigger
+              <TabsList className="grid grid-cols-5 w-full gap-2 bg-cyan-300">
+                {/* <TabsTrigger
                   value=""
                   className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
                 >
                   All
+                </TabsTrigger> */}
+                <TabsTrigger
+                  value=""
+                  className="bg-white hover:bg-blue-200 data-[state=active]:bg-blue-400"
+                >
+                  Open
                 </TabsTrigger>
                 <TabsTrigger
                   value="3"
                   className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
                 >
                   In Progress
-                </TabsTrigger>
-                <TabsTrigger
-                  value="2"
-                  className="bg-white hover:bg-blue-200 data-[state=active]:bg-blue-400"
-                >
-                  Open
                 </TabsTrigger>
                 <TabsTrigger
                   value="10"

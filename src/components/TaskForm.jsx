@@ -11,7 +11,7 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, RefreshCcw } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setTaskName,
@@ -24,19 +24,19 @@ import { ADD_TASK_API, USER_API_END_POINT } from "./utils/api_const";
 import axios from "axios";
 import { toast } from "sonner";
 
-const TaskForm = ({ task }) => {
+const TaskForm = ({ task, refresh, search, filter }) => {
   const { loggedUser } = useSelector((store) => store.auth);
   const [showAssignBox, setShowAssignBox] = useState(null);
   const [step, setStep] = useState("task");
   const { taskName, taskDesc, allUsers, assignedUser, targetDate } =
     useSelector((store) => store.taskForm);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchUser, setSearchUser] = useState("");
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (!showAssignBox) {
       setStep("task");
-      setSearchTerm("");
+      setSearchUser("");
       dispatch(setTaskName(""));
       dispatch(setTaskDesc(""));
       dispatch(setAllUsers([]));
@@ -50,11 +50,11 @@ const TaskForm = ({ task }) => {
       handleUsers(
         `${loggedUser.locationId}`,
         "EMPLOYEE",
-        searchTerm,
+        searchUser,
         `${loggedUser.deptName}`
       );
     }
-  }, [searchTerm]);
+  }, [searchUser]);
 
   const handleUsers = async (
     locationId,
@@ -102,6 +102,7 @@ const TaskForm = ({ task }) => {
         reference_task: task.TaskId,
       });
       // Optionally refetch activities or update local state
+      await refresh(search, filter);
       toast.success("Task Assigned Successfully");
     } catch (error) {
       console.error(error);
@@ -210,8 +211,8 @@ const TaskForm = ({ task }) => {
                   <Label>Search employees...</Label>
                   <Input
                     placeholder="Search by name or email..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    value={searchUser}
+                    onChange={(e) => setSearchUser(e.target.value)}
                   />
                 </div>
 

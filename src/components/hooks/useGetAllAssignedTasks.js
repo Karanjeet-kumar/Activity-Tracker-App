@@ -34,7 +34,9 @@ export default function useLoadTaskPage() {
         // Prepare query params
         const queryParams = new URLSearchParams();
         if (taskName) queryParams.append("task_name", taskName);
-        if (status) queryParams.append("status", status);
+        if (status !== undefined && status !== null && status !== "") {
+          queryParams.append("status", status);
+        }
 
         const res = await axios.get(
           `${TASK_API_END_POINT}/${userId}/?${queryParams.toString()}`

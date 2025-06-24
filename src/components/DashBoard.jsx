@@ -12,38 +12,45 @@ import { useNav } from "./context/NavContext";
 
 function Dashboard() {
   const { isNavVisible } = useNav();
-  const [selectedCard, setSelectedCard] = useState("Total Tasks");
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  // const [selectedCard, setSelectedCard] = useState("Total Tasks");
 
-  const cards = [
-    {
-      title: "Total Tasks",
-      value: "3",
-      gradient: "from-blue-500 to-blue-200",
-      border: "border-blue-800",
-      icon: <CalendarClock size={40} />,
-    },
-    {
-      title: "In Progress",
-      value: "1",
-      gradient: "from-yellow-500 to-yellow-200",
-      border: "border-yellow-800",
-      icon: <Clock4 size={40} />,
-    },
-    {
-      title: "Completed",
-      value: "1",
-      gradient: "from-green-500 to-green-200",
-      border: "border-green-800",
-      icon: <CircleCheckBig size={40} />,
-    },
-    {
-      title: "Pending",
-      value: "1",
-      gradient: "from-red-500 to-red-200",
-      border: "border-red-800",
-      icon: <CircleAlert size={40} />,
-    },
-  ];
+  // const cards = [
+  //   {
+  //     title: "Total Tasks",
+  //     value: "3",
+  //     gradient: "from-blue-500 to-blue-200",
+  //     border: "border-blue-800",
+  //     icon: <CalendarClock size={40} />,
+  //   },
+  //   {
+  //     title: "In Progress",
+  //     value: "1",
+  //     gradient: "from-yellow-500 to-yellow-200",
+  //     border: "border-yellow-800",
+  //     icon: <Clock4 size={40} />,
+  //   },
+  //   {
+  //     title: "Completed",
+  //     value: "1",
+  //     gradient: "from-green-500 to-green-200",
+  //     border: "border-green-800",
+  //     icon: <CircleCheckBig size={40} />,
+  //   },
+  //   {
+  //     title: "Pending",
+  //     value: "1",
+  //     gradient: "from-red-500 to-red-200",
+  //     border: "border-red-800",
+  //     icon: <CircleAlert size={40} />,
+  //   },
+  // ];
 
   return (
     <div>
@@ -63,13 +70,13 @@ function Dashboard() {
             <div>
               <h1 className="text-2xl font-bold">DashBoard</h1>
               <h1 className="text-1xl text-gray-400 font-bold">
-                Monday, May 19, 2025
+                {formattedDate}
               </h1>
             </div>
           </div>
 
           {/* Metrics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {cards.map((card) => (
               <div
                 key={card.title}
@@ -91,7 +98,7 @@ function Dashboard() {
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

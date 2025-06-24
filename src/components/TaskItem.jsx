@@ -8,9 +8,11 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { useSelector } from "react-redux";
 
 const TaskItem = ({ task, level, openTasks, setOpenTasks }) => {
   const isOpen = openTasks?.includes(task.taskId);
+  const { loggedUser } = useSelector((store) => store.auth);
 
   const toggleTask = () => {
     if (isOpen) {
@@ -25,8 +27,9 @@ const TaskItem = ({ task, level, openTasks, setOpenTasks }) => {
       className={`border rounded-lg overflow-hidden ${level > 0 ? "ml-6" : ""}`}
     >
       <div
-        className={`flex items-center justify-between p-4 cursor-pointer 
-                   ${isOpen ? "bg-blue-50" : "bg-gray-50"} hover:bg-blue-100`}
+        className={`flex items-center justify-between p-4 cursor-pointer ${
+          isOpen ? "bg-blue-50" : "bg-gray-50"
+        } hover:bg-blue-100`}
         onClick={toggleTask}
       >
         <div className="flex items-center gap-3">
@@ -78,13 +81,10 @@ const TaskItem = ({ task, level, openTasks, setOpenTasks }) => {
               <Badge className="bg-gray-200" variant="secondary">
                 {task.assignedTo}
               </Badge>
-              {level > 0 ? (
+
+              {!!loggedUser.isHOD && level > 0 && (
                 <Badge className="bg-gray-200" variant="secondary">
                   EMPLOYEE
-                </Badge>
-              ) : (
-                <Badge className="bg-gray-200" variant="secondary">
-                  HOD
                 </Badge>
               )}
             </div>
@@ -100,7 +100,7 @@ const TaskItem = ({ task, level, openTasks, setOpenTasks }) => {
       {isOpen && (
         <div className="p-4 space-y-4 bg-white">
           {/* Task Updates */}
-          {task.updates?.length > 0 && (
+          {task.updates?.length > 0 ? (
             <div>
               <h5 className="font-medium mb-2 flex items-center gap-2 text-gray-700">
                 <RefreshCw className="h-4 w-4" /> Updates
@@ -140,6 +140,21 @@ const TaskItem = ({ task, level, openTasks, setOpenTasks }) => {
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <h5 className="font-medium mb-2 flex items-center gap-2 text-gray-700">
+                <RefreshCw className="h-4 w-4" /> Updates
+              </h5>
+              <div className="space-y-3">
+                <Card className="bg-gray-50">
+                  <CardContent className="p-3">
+                    <div className="text-center font-semibold">
+                      No Updates till now..
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           )}
