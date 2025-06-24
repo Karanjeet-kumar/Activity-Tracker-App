@@ -903,19 +903,19 @@ function ActivityPage() {
                   >
                     All
                   </TabsTrigger> */}
+
                   <TabsTrigger
                     value=""
-                    className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
-                  >
-                    In Progress
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="1"
                     className="bg-white hover:bg-blue-200 data-[state=active]:bg-blue-400"
                   >
                     New
                   </TabsTrigger>
-
+                  <TabsTrigger
+                    value="3"
+                    className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
+                  >
+                    In Progress
+                  </TabsTrigger>
                   <TabsTrigger
                     value="5"
                     className="bg-white hover:bg-green-200 data-[state=active]:bg-green-400"

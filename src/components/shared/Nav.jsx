@@ -59,10 +59,12 @@ function Nav() {
     setActiveNav(location.pathname);
   }, [location.pathname]);
 
-  if (!isNavVisible) return null;
-
   return (
-    <div className="w-64 bg-gradient-to-r from-cyan-100 to-cyan-600 p-4 border-r fixed top-16 left-0 h-[calc(100vh-4rem)] z-40 overflow-y-auto flex flex-col">
+    <div
+      className={`bg-gradient-to-r from-cyan-100 to-cyan-600 p-4 border-r fixed top-16 h-[calc(100vh-4rem)] z-40 overflow-y-auto flex flex-col w-64
+    transform transition-transform duration-300 ease-in-out
+    ${isNavVisible ? "translate-x-0" : "-translate-x-full"}`}
+    >
       {/* Navigation Section */}
       <nav className="space-y-4 flex-1">
         <div className="space-y-2">
