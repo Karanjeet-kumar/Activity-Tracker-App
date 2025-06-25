@@ -3,14 +3,23 @@ import axios from "axios";
 import Navbar from "./shared/Navbar";
 import Nav from "./shared/Nav";
 import {
+  AlertCircle,
   CalendarClock,
+  CheckCircle,
   CircleAlert,
+  CircleCheck,
   CircleCheckBig,
+  CircleDashed,
+  CircleFadingPlus,
+  CircleGauge,
   Clock4,
   LayoutDashboard,
 } from "lucide-react";
 import { useNav } from "./context/NavContext";
-import { ACTIVITY_STATUS_COUNT_API_END_POINT } from "./utils/api_const";
+import {
+  ACTIVITY_STATUS_COUNT_API_END_POINT,
+  TASK_STATUS_COUNT_API_END_POINT,
+} from "./utils/api_const";
 import { useSelector } from "react-redux";
 
 function Dashboard() {
@@ -31,7 +40,9 @@ function Dashboard() {
   const [selectedCard, setSelectedCard] = useState("Total Tasks");
 
   useEffect(() => {
-    const fetchStatusCounts = async () => {
+    if (!loggedUser) return;
+
+    const fetchAdminStatusCounts = async () => {
       // API(ACTIVITY_STATUS_COUNT_API_END_POINT)--->Connected
       try {
         const response = await axios.get(
@@ -41,57 +52,124 @@ function Dashboard() {
         setDelayedCount(response.data.delayed_activity_count || 0);
         setOnTrackCount(response.data.onTrack_activity_count || 0);
       } catch (error) {
-        console.error("Failed to fetch status counts:", error);
+        console.error("Failed to fetch admin activity status counts:", error);
       }
     };
 
-    fetchStatusCounts();
+    const fetchUserStatusCounts = async () => {
+      // API(TASK_STATUS_COUNT_API_END_POINT)--->Connected
+      try {
+        const response = await axios.get(
+          `${TASK_STATUS_COUNT_API_END_POINT}/${loggedUser.user_id}/`
+        );
+        setStatusCounts(response.data.status_wise_counts || {});
+        setDelayedCount(response.data.delayed_task_count || 0);
+        // setOnTrackCount(response.data.onTrack_activity_count || 0);
+      } catch (error) {
+        console.error("Failed to fetch user task status counts:", error);
+      }
+    };
+
+    if (loggedUser.isAdmin) {
+      fetchAdminStatusCounts();
+    } else {
+      fetchUserStatusCounts();
+    }
   }, []);
 
-  const cards = [
-    {
-      title: "On Track",
-      value: onTrackCount,
-      gradient: "from-blue-200 to-blue-100",
-      border: "border-blue-800",
-      icon: <CalendarClock size={30} />,
-    },
-    {
-      title: "Delayed",
-      value: delayedCount,
-      gradient: "from-red-200 to-red-100",
-      border: "border-red-800",
-      icon: <CalendarClock size={30} />,
-    },
-    {
-      title: "New",
-      value: statusCounts["New"] || 0,
-      gradient: "from-blue-200 to-blue-100",
-      border: "border-blue-800",
-      icon: <CalendarClock size={30} />,
-    },
-    {
-      title: "In Progress",
-      value: statusCounts["InProgress"] || 0,
-      gradient: "from-yellow-200 to-yellow-100",
-      border: "border-yellow-800",
-      icon: <Clock4 size={30} />,
-    },
-    {
-      title: "Completed",
-      value: statusCounts["Completed"] || 0,
-      gradient: "from-green-200 to-green-100",
-      border: "border-green-800",
-      icon: <CircleCheckBig size={30} />,
-    },
-    {
-      title: "Pending",
-      value: statusCounts["Rejected"] || 0,
-      gradient: "from-red-200 to-red-100",
-      border: "border-red-800",
-      icon: <CircleAlert size={30} />,
-    },
-  ];
+  let cards = [];
+
+  if (loggedUser.isAdmin) {
+    cards = [
+      {
+        title: "On Track",
+        value: onTrackCount,
+        gradient: "from-blue-200 to-blue-100",
+        border: "border-blue-800",
+        icon: <CheckCircle size={30} />,
+      },
+      {
+        title: "Delayed",
+        value: delayedCount,
+        gradient: "from-red-200 to-red-100",
+        border: "border-red-800",
+        icon: <CircleGauge size={30} />,
+      },
+      {
+        title: "New",
+        value: statusCounts["New"] || 0,
+        gradient: "from-blue-200 to-blue-100",
+        border: "border-blue-800",
+        icon: <CircleFadingPlus size={30} />,
+      },
+      {
+        title: "In Progress",
+        value: statusCounts["InProgress"] || 0,
+        gradient: "from-yellow-200 to-yellow-100",
+        border: "border-yellow-800",
+        icon: <Clock4 size={30} />,
+      },
+      {
+        title: "Completed",
+        value: statusCounts["Completed"] || 0,
+        gradient: "from-green-200 to-green-100",
+        border: "border-green-800",
+        icon: <CircleCheck size={30} />,
+      },
+      {
+        title: "Pending",
+        value: statusCounts["Rejected"] || 0,
+        gradient: "from-red-200 to-red-100",
+        border: "border-red-800",
+        icon: <CircleAlert size={30} />,
+      },
+    ];
+  } else {
+    cards = [
+      {
+        title: "Delayed",
+        value: delayedCount,
+        gradient: "from-red-200 to-red-100",
+        border: "border-red-800",
+        icon: <CircleGauge size={30} />,
+      },
+      {
+        title: "Open",
+        value: statusCounts["Open"] || 0,
+        gradient: "from-blue-200 to-blue-100",
+        border: "border-blue-800",
+        icon: <CircleDashed size={30} />,
+      },
+      {
+        title: "In Progress",
+        value: statusCounts["InProgress"] || 0,
+        gradient: "from-yellow-200 to-yellow-100",
+        border: "border-yellow-800",
+        icon: <Clock4 size={30} />,
+      },
+      {
+        title: "Completed",
+        value: statusCounts["Completed"] || 0,
+        gradient: "from-green-200 to-green-100",
+        border: "border-green-800",
+        icon: <CircleCheck size={30} />,
+      },
+      {
+        title: "Re Open",
+        value: statusCounts["ReOpen"] || 0,
+        gradient: "from-red-200 to-red-100",
+        border: "border-red-800",
+        icon: <CircleAlert size={30} />,
+      },
+      {
+        title: "Verified",
+        value: statusCounts["Verified"] || 0,
+        gradient: "from-orange-200 to-orange-100",
+        border: "border-orange-800",
+        icon: <CheckCircle size={30} />,
+      },
+    ];
+  }
 
   if (!loggedUser) {
     return (
@@ -136,7 +214,7 @@ function Dashboard() {
           </div>
 
           {/* Metrics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {cards.map((card) => (
               <div
                 key={card.title}
