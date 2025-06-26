@@ -280,7 +280,7 @@ function MyTaskPage() {
           {allAssignedTask.map((task) => (
             <div
               key={task.TaskId}
-              className=" border border-gray-400 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+              className="border-2 border-blue-200 border-l-8 rounded-4xl shadow-md hover:shadow-2xl transition-shadow"
             >
               <CardHeader className="p-3 space-y-2">
                 <div className="flex justify-between items-center">

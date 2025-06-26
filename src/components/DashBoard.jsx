@@ -21,6 +21,7 @@ import {
   TASK_STATUS_COUNT_API_END_POINT,
 } from "./utils/api_const";
 import { useSelector } from "react-redux";
+import ActivityInfo from "./ActivityInfo";
 
 function Dashboard() {
   const { isNavVisible } = useNav();
@@ -36,14 +37,18 @@ function Dashboard() {
   const [statusCounts, setStatusCounts] = useState({});
   const [delayedCount, setDelayedCount] = useState(0);
   const [onTrackCount, setOnTrackCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   const [selectedCard, setSelectedCard] = useState("Total Tasks");
+  const [delayedActivities, setDelayedActivities] = useState([]);
+  const [onTrackActivities, setOnTrackActivities] = useState([]);
 
   useEffect(() => {
     if (!loggedUser) return;
 
+    setIsLoading(true); // Start loading
+
     const fetchAdminStatusCounts = async () => {
-      // API(ACTIVITY_STATUS_COUNT_API_END_POINT)--->Connected
       try {
         const response = await axios.get(
           `${ACTIVITY_STATUS_COUNT_API_END_POINT}/${loggedUser?.user_id}/`
@@ -51,22 +56,26 @@ function Dashboard() {
         setStatusCounts(response.data.status_wise_counts || {});
         setDelayedCount(response.data.delayed_activity_count || 0);
         setOnTrackCount(response.data.onTrack_activity_count || 0);
+        setDelayedActivities(response.data.delayed_activities || []);
+        setOnTrackActivities(response.data.onTrack_activities || []);
       } catch (error) {
         console.error("Failed to fetch admin activity status counts:", error);
+      } finally {
+        setIsLoading(false); // End loading regardless of success/failure
       }
     };
 
     const fetchUserStatusCounts = async () => {
-      // API(TASK_STATUS_COUNT_API_END_POINT)--->Connected
       try {
         const response = await axios.get(
           `${TASK_STATUS_COUNT_API_END_POINT}/${loggedUser.user_id}/`
         );
         setStatusCounts(response.data.status_wise_counts || {});
         setDelayedCount(response.data.delayed_task_count || 0);
-        // setOnTrackCount(response.data.onTrack_activity_count || 0);
       } catch (error) {
         console.error("Failed to fetch user task status counts:", error);
+      } finally {
+        setIsLoading(false); // End loading regardless of success/failure
       }
     };
 
@@ -77,23 +86,29 @@ function Dashboard() {
     }
   }, []);
 
+  useEffect(() => {
+    if (loggedUser?.isAdmin) {
+      setSelectedCard("Delayed");
+    }
+  }, [loggedUser]);
+
   let cards = [];
 
-  if (loggedUser.isAdmin) {
+  if (loggedUser?.isAdmin) {
     cards = [
-      {
-        title: "On Track",
-        value: onTrackCount,
-        gradient: "from-blue-200 to-blue-100",
-        border: "border-blue-800",
-        icon: <CheckCircle size={30} />,
-      },
       {
         title: "Delayed",
         value: delayedCount,
         gradient: "from-red-200 to-red-100",
         border: "border-red-800",
         icon: <CircleGauge size={30} />,
+      },
+      {
+        title: "On Track",
+        value: onTrackCount,
+        gradient: "from-green-200 to-green-100",
+        border: "border-green-800",
+        icon: <CheckCircle size={30} />,
       },
       {
         title: "New",
@@ -124,7 +139,7 @@ function Dashboard() {
         icon: <CircleAlert size={30} />,
       },
     ];
-  } else {
+  } else if (loggedUser) {
     cards = [
       {
         title: "Delayed",
@@ -171,17 +186,91 @@ function Dashboard() {
     ];
   }
 
-  if (!loggedUser) {
+  // Loading state rendering
+  if (!loggedUser || isLoading) {
     return (
       <div>
         <Navbar />
         <div className="flex h-screen">
           <Nav />
-          <div className="flex-1 overflow-auto p-6">
-            <div className="flex items-center justify-center max-h-[300px] h-[300px]">
-              <div className="flex flex-col items-center space-y-3">
-                <div className="border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full w-12 h-12 animate-spin"></div>
-                <p className="text-muted-foreground">Loading dashboard...</p>
+          <div className="flex-1 overflow-auto p-6 h-[calc(100vh-4rem)]">
+            <div className="flex items-center gap-2 mb-8">
+              <div className="bg-gray-200 rounded-md p-1 animate-pulse">
+                <div className="w-8 h-8" />
+              </div>
+              <div>
+                <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-2"></div>
+                <div className="h-6 w-64 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Metrics Cards Skeleton */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between items-center cursor-pointer h-20 border-l-4 border-gray-300 rounded-lg p-2 bg-gray-100 animate-pulse"
+                >
+                  <div className="p-1 bg-gray-200 rounded-full w-10 h-10"></div>
+                  <div>
+                    <div className="h-4 w-16 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-6 w-8 bg-gray-200 rounded"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Activities Table Skeleton */}
+            <div className="mt-8 bg-white rounded-lg shadow-md p-4">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-6 h-6 bg-gray-200 rounded-full animate-pulse"></div>
+                <div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 w-12 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      </th>
+                      <th className="px-6 py-3">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      </th>
+                      <th className="px-6 py-3">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      </th>
+                      <th className="px-6 py-3">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      </th>
+                      <th className="px-6 py-3">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4">
+                          <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="h-4 bg-gray-100 rounded animate-pulse"></div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -240,6 +329,167 @@ function Dashboard() {
               </div>
             ))}
           </div>
+
+          {/* Activities Table Section */}
+          {!!loggedUser?.isAdmin && (
+            <div
+              className={`border-2 ${
+                selectedCard === "Delayed"
+                  ? "border-red-800"
+                  : "border-green-800"
+              } border-l-8 rounded-4xl shadow-md hover:shadow-2xl transition-shadow mt-8 bg-white p-4`}
+            >
+              {selectedCard === "Delayed" ? (
+                <>
+                  <div className="flex bg-gradient-to-r from-red-200 to-red-100 rounded-4xl p-2 items-center gap-2 mb-4">
+                    <AlertCircle className="text-red-500" />
+                    <h2 className="text-xl font-bold">Delayed Activities</h2>
+                    <span className="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                      {delayedCount} {delayedCount === 1 ? "item" : "items"}
+                    </span>
+                  </div>
+
+                  {delayedActivities.length > 0 ? (
+                    <div className="max-h-40 overflow-y-auto overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Activity
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Track
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Target Date
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Delayed Days
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {delayedActivities.map((activity) => (
+                            <tr
+                              key={activity.ActivityId}
+                              className="hover:bg-gray-50"
+                            >
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {activity.ActivityName}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                  {activity.Status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <ActivityInfo activity={activity} />
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div className="flex items-center">
+                                  <CalendarClock className="mr-1 h-4 w-4 text-red-500" />
+                                  {new Date(
+                                    activity.TargetDate
+                                  ).toLocaleDateString("en-IN")}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                  {activity.DelayedDays} Days Delay
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <CircleCheckBig className="mx-auto h-12 w-12 text-green-500" />
+                      <p className="mt-2">No delayed activities found</p>
+                    </div>
+                  )}
+                </>
+              ) : selectedCard === "On Track" ? (
+                <>
+                  <div className="flex bg-gradient-to-r from-green-200 to-green-100 rounded-4xl p-2 items-center gap-2 mb-4">
+                    <CheckCircle className="text-green-500" />
+                    <h2 className="text-xl font-bold">On Track Activities</h2>
+                    <span className="ml-2 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                      {onTrackCount} {onTrackCount === 1 ? "item" : "items"}
+                    </span>
+                  </div>
+
+                  {onTrackActivities.length > 0 ? (
+                    <div className="max-h-40 overflow-y-auto overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Activity
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Track
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Target Date
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Days Remaining
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {onTrackActivities.map((activity) => (
+                            <tr
+                              key={activity.ActivityId}
+                              className="hover:bg-gray-50"
+                            >
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {activity.ActivityName}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                  {activity.Status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <ActivityInfo activity={activity} />
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div className="flex items-center">
+                                  <CalendarClock className="mr-1 h-4 w-4 text-green-500" />
+                                  {new Date(
+                                    activity.TargetDate
+                                  ).toLocaleDateString("en-IN")}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                  {activity.OnTrackDaysRemaining} Days Remaining
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <CircleCheckBig className="mx-auto h-12 w-12 text-green-500" />
+                      <p className="mt-2">No on-track activities found</p>
+                    </div>
+                  )}
+                </>
+              ) : null}
+            </div>
+          )}
         </div>
       </div>
     </div>
