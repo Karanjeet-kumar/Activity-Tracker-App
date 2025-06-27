@@ -68,6 +68,7 @@ function Nav() {
       {/* Navigation Section */}
       <nav className="space-y-4 flex-1">
         <div className="space-y-2">
+        {!!loggedUser?.isAdmin && (
           <Link to="/dashboard">
             <Button
               variant={activeNav === "/dashboard" ? "default" : "ghost"}
@@ -77,6 +78,7 @@ function Nav() {
               Dashboard
             </Button>
           </Link>
+        )}
 
           <Link to="/activities">
             <Button

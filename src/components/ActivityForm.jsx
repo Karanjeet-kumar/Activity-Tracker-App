@@ -173,8 +173,8 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
 
         // Call the refresh callback if provided
         if (onActivityCreated) {
-          await onActivityCreated("", "1");
-          setStatusFilter("1");
+          await onActivityCreated();
+          setStatusFilter("");
         }
       } else {
         toast.error("Activity Creation Failed");
@@ -250,12 +250,12 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
               <h3 className="text-lg font-medium">Select Category</h3>
               <div className="grid grid-cols-2 gap-4">
                 {allCategories.map((category) => (
-                  <Card
+                  <div
                     key={category.category_id}
-                    className={`cursor-pointer transition-colors ${
+                    className={`cursor-pointer transition-colors rounded-xl border-1 ${
                       selectedCategory?.category_id === category.category_id
                         ? "border-blue-500 bg-blue-100"
-                        : "hover:border-blue-500 hover:bg-blue-50"
+                        : "hover:border-blue-500 hover:bg-blue-50 bg-gray-100"
                     }`}
                     onClick={() => {
                       dispatch(setSelectedCategory(category));
@@ -263,13 +263,13 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                       setStep("activity");
                     }}
                   >
-                    <CardContent className="p-4">
-                      <h3 className="font-medium">{category.category_name}</h3>
+                    <CardContent className="p-1">
+                      <h3 className="font-medium text-center">{category.category_name}</h3>
                       {/* <p className="text-sm text-muted-foreground">
                         {category.description}
                       </p> */}
                     </CardContent>
-                  </Card>
+                  </div>
                 ))}
               </div>
             </div>

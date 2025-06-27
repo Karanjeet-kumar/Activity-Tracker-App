@@ -31,31 +31,37 @@ const Login = () => {
     try {
       dispatch(setLoading(true));
       const res = await axios.post(LOGIN_API, input, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
+
       if (res.data.success) {
         dispatch(setLoggedUser(res.data.user));
         localStorage.setItem("access_token", res.data.access_token);
         localStorage.setItem("refresh_token", res.data.refresh_token);
-        navigate("/dashboard");
+        // navigate("/dashboard");
         toast.success(res.data.message);
+        // Navigation will happen in useEffect when loggedUser updates
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message || "Login failed.");
     } finally {
       dispatch(setLoading(false));
     }
   };
 
+  // Handle redirect on successful login
   useEffect(() => {
     if (loggedUser) {
-      navigate("/dashboard");
+      if (loggedUser?.isAdmin) {
+        navigate("/dashboard");
+      } else {
+        navigate("/activities");
+      }
     }
-  }, []);
+  }, [loggedUser, navigate]);
+
   return (
     <div className="bg-custom w-full h-screen m-0 p-0">
       <div className="min-h-screen flex items-center justify-center ">
@@ -90,8 +96,7 @@ const Login = () => {
           </div>
           {loading ? (
             <Button className="w-full my-4 bg-blue-600 hover:bg-blue-500">
-              {" "}
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait{" "}
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
             </Button>
           ) : (
             <Button
