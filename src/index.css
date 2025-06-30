@@ -126,7 +126,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .bg-custom {
-  background-image: url('/bg-img.png'); /* assuming bg-img.png is in public/ */
+  background-image: url('/bg-img.png'); 
   background-size: cover;
   background-position: center;
 }

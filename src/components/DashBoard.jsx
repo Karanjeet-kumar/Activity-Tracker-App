@@ -22,6 +22,7 @@ import {
 } from "./utils/api_const";
 import { useSelector } from "react-redux";
 import ActivityInfo from "./ActivityInfo";
+import useLoadActivityPage from "./hooks/useLoadActivityPage";
 
 function Dashboard() {
   const { isNavVisible } = useNav();
@@ -33,13 +34,14 @@ function Dashboard() {
     year: "numeric",
   });
   const { loggedUser } = useSelector((store) => store.auth);
+  // const { refresh } = useLoadActivityPage();
 
   const [statusCounts, setStatusCounts] = useState({});
   const [delayedCount, setDelayedCount] = useState(0);
   const [onTrackCount, setOnTrackCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true); // Loading state
 
-  const [selectedCard, setSelectedCard] = useState("Total Tasks");
+  const [selectedCard, setSelectedCard] = useState("Delayed");
   const [delayedActivities, setDelayedActivities] = useState([]);
   const [onTrackActivities, setOnTrackActivities] = useState([]);
 
@@ -336,7 +338,15 @@ function Dashboard() {
               className={`border-2 ${
                 selectedCard === "Delayed"
                   ? "border-red-800"
-                  : "border-green-800"
+                  : selectedCard === "On Track"
+                  ? "border-green-800"
+                  : selectedCard === "New"
+                  ? "border-blue-800"
+                  : selectedCard === "In Progress"
+                  ? "border-yellow-800"
+                  : selectedCard === "Completed"
+                  ? "border-green-800"
+                  : "border-red-800"
               } border-l-8 rounded-4xl shadow-md hover:shadow-2xl transition-shadow mt-8 bg-white p-4`}
             >
               {selectedCard === "Delayed" ? (
@@ -484,6 +494,108 @@ function Dashboard() {
                     <div className="text-center py-8 text-gray-500">
                       <CircleCheckBig className="mx-auto h-12 w-12 text-green-500" />
                       <p className="mt-2">No on-track activities found</p>
+                    </div>
+                  )}
+                </>
+              ) : selectedCard === "New" ? (
+                <>
+                  <div className="flex bg-gradient-to-r from-blue-200 to-blue-100 rounded-4xl p-2 items-center gap-2 mb-4">
+                    <CircleFadingPlus className="text-blue-500" />
+                    <h2 className="text-xl font-bold">New Activities</h2>
+                    <span className="ml-2 bg-green-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                      {statusCounts["New"] || "0 "}
+                      {statusCounts["New"] === 1 ? " item" : " items"}
+                    </span>
+                  </div>
+
+                  {statusCounts["New"] > 0 ? (
+                    <div className="text-center py-8">
+                      <MoreInfoButton
+                      // status={selectedCard}
+                      // onClick={() => handleMoreInfo("New")}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <CircleFadingPlus className="mx-auto h-12 w-12 text-blue-500" />
+                      <p className="mt-2">No new activities found</p>
+                    </div>
+                  )}
+                </>
+              ) : selectedCard === "In Progress" ? (
+                <>
+                  <div className="flex bg-gradient-to-r from-yellow-200 to-yellow-100 rounded-4xl p-2 items-center gap-2 mb-4">
+                    <Clock4 className="text-yellow-500" />
+                    <h2 className="text-xl font-bold">
+                      In Progress Activities
+                    </h2>
+                    <span className="ml-2 bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                      {statusCounts["InProgress"] || "0 "}
+                      {statusCounts["InProgress"] === 1 ? " item" : " items"}
+                    </span>
+                  </div>
+
+                  {statusCounts["InProgress"] > 0 ? (
+                    <div className="text-center py-8">
+                      <MoreInfoButton
+                      // status={selectedCard}
+                      // onClick={() => handleMoreInfo("New")}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <Clock4 className="mx-auto h-12 w-12 text-yellow-500" />
+                      <p className="mt-2">No InProgreess activities found</p>
+                    </div>
+                  )}
+                </>
+              ) : selectedCard === "Completed" ? (
+                <>
+                  <div className="flex bg-gradient-to-r from-green-200 to-green-100 rounded-4xl p-2 items-center gap-2 mb-4">
+                    <CircleCheck className="text-green-500" />
+                    <h2 className="text-xl font-bold">Completed Activities</h2>
+                    <span className="ml-2 bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                      {statusCounts["Completed"] || "0 "}
+                      {statusCounts["Completed"] === 1 ? " item" : " items"}
+                    </span>
+                  </div>
+
+                  {statusCounts["Completed"] > 0 ? (
+                    <div className="text-center py-8">
+                      <MoreInfoButton
+                      // status={selectedCard}
+                      // onClick={() => handleMoreInfo("New")}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <CircleCheck className="mx-auto h-12 w-12 text-green-500" />
+                      <p className="mt-2">No Completed activities found</p>
+                    </div>
+                  )}
+                </>
+              ) : selectedCard === "Pending" ? (
+                <>
+                  <div className="flex bg-gradient-to-r from-red-200 to-red-100 rounded-4xl p-2 items-center gap-2 mb-4">
+                    <CircleAlert className="text-red-500" />
+                    <h2 className="text-xl font-bold">Pending Activities</h2>
+                    <span className="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                      {statusCounts["Rejected"] || "0 "}
+                      {statusCounts["Rejected"] === 1 ? " item" : " items"}
+                    </span>
+                  </div>
+
+                  {statusCounts["Rejected"] > 0 ? (
+                    <div className="text-center py-8">
+                      <MoreInfoButton
+                      // status={selectedCard}
+                      // onClick={() => handleMoreInfo("New")}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <CircleAlert className="mx-auto h-12 w-12 text-red-500" />
+                      <p className="mt-2">No Pending activities found</p>
                     </div>
                   )}
                 </>

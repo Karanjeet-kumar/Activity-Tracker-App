@@ -28,6 +28,7 @@ import {
   setSelectedCategory,
   setAllActivities,
   setSelectedActivity,
+  setAllDepartments,
   setAllUsers,
   setAssignedUser,
   setAllVerifiers,
@@ -39,6 +40,7 @@ import axios from "axios";
 import {
   ACTIVITY_API_END_POINT,
   ADD_ACTIVITY_API,
+  DEPT_API_END_POINT,
   USER_API_END_POINT,
   VERIFIER_API_END_POINT,
 } from "./utils/api_const";
@@ -52,6 +54,7 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
     selectedCategory,
     allActivities,
     selectedActivity,
+    allDepartments,
     allUsers,
     assignedUser,
     allVerifiers,
@@ -84,6 +87,16 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
       dispatch(setAllActivities(response.data.activities));
     } catch (error) {
       console.error("Failed to fetch activities", error);
+    }
+  };
+
+  const handleDept = async (locationId) => {
+    // API(DEPT_API)--->Connected
+    try {
+      const response = await axios.get(`${DEPT_API_END_POINT}/${locationId}/`);
+      dispatch(setAllDepartments(response.data.departments));
+    } catch (error) {
+      console.error("Failed to fetch departments", error);
     }
   };
 
@@ -140,6 +153,7 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
       setUserRole("hod");
       dispatch(setAllUsers([]));
       dispatch(setAssignedUser(""));
+      dispatch(setAllDepartments([]));
       dispatch(setAllVerifiers([]));
       dispatch(setAssignedVerifier(""));
       dispatch(setTargetDate(""));
@@ -160,8 +174,6 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
 
     // return () => clearTimeout(delayDebounce);
   }, [userRole, searchTerm, deptFilter]);
-
-  const departments = ["Boiler", "Turbine", "BOP", "IT"];
 
   const handleCreateActivity = async (formData) => {
     // API(ADD_ACTIVITY_API)--->Connected
@@ -264,7 +276,9 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                     }}
                   >
                     <CardContent className="p-1">
-                      <h3 className="font-medium text-center">{category.category_name}</h3>
+                      <h3 className="font-medium text-center">
+                        {category.category_name}
+                      </h3>
                       {/* <p className="text-sm text-muted-foreground">
                         {category.description}
                       </p> */}
@@ -301,6 +315,7 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                     onClick={() => {
                       dispatch(setSelectedActivity(activity));
                       handleUsers(`${loggedUser.locationId}`, userRole);
+                      handleDept(`${loggedUser.locationId}`);
                       setStep("user");
                     }}
                   >
@@ -361,6 +376,7 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                           })
                         );
                         handleUsers(`${loggedUser.locationId}`, userRole);
+                        handleDept(`${loggedUser.locationId}`);
                         setStep("user");
                       }
                     }}
@@ -425,9 +441,12 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All departments</SelectItem>
-                      {departments.map((dept) => (
-                        <SelectItem key={dept} value={dept}>
-                          {dept}
+                      {allDepartments.map((dept) => (
+                        <SelectItem
+                          key={dept.department_id}
+                          value={String(dept.department_name)}
+                        >
+                          {dept.department_name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -443,7 +462,8 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                 </div>
               </div>
               ) : ( */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
                 {allUsers.map((user) => (
                   <div
                     key={user.user_id}
@@ -466,13 +486,88 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                       <span className="bg-green-300 px-2 py-1 rounded">
                         {user.user_role}
                       </span>
-                      <span className="bg-cyan-300 px-2 py-1 rounded">
-                        {user.department_name}
-                      </span>
+                      {user.departments.map((dept, index) => (
+                        <span
+                          key={index}
+                          className="bg-cyan-300 px-2 py-1 rounded mr-2"
+                        >
+                          {dept.department_name}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 ))}
+              </div> */}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                {allUsers.flatMap((user) =>
+                  user.departments.length > 0
+                    ? user.departments.map((dept, index) => (
+                        <div
+                          key={`${user.user_id}-${dept.department_id}`}
+                          className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                            assignedUser?.user_id === user.user_id &&
+                            assignedUser?.department_id === dept.department_id
+                              ? "border-blue-500 bg-blue-100"
+                              : "hover:border-blue-500 hover:bg-blue-50"
+                          }`}
+                          onClick={() => {
+                            dispatch(
+                              setAssignedUser({
+                                ...user,
+                                department_id: dept.department_id,
+                                department_name: dept.department_name,
+                              })
+                            );
+                            handleVerifiers(`${loggedUser.locationId}`);
+                            setStep("summary");
+                          }}
+                        >
+                          <div className="font-medium">{user.user_name}</div>
+                          <div className="text-sm text-muted-foreground truncate overflow-hidden whitespace-nowrap">
+                            {user.email_id}
+                          </div>
+                          <div className="flex gap-2 mt-2 text-xs">
+                            <span className="bg-green-300 px-2 py-1 rounded">
+                              {user.user_role}
+                            </span>
+                            <span className="bg-cyan-300 px-2 py-1 rounded">
+                              {dept.department_name}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    : [
+                        <div
+                          key={user.user_id}
+                          className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                            assignedUser?.user_id === user.user_id
+                              ? "border-blue-500 bg-blue-100"
+                              : "hover:border-blue-500 hover:bg-blue-50"
+                          }`}
+                          onClick={() => {
+                            dispatch(setAssignedUser(user));
+                            handleVerifiers(`${loggedUser.locationId}`);
+                            setStep("summary");
+                          }}
+                        >
+                          <div className="font-medium">{user.user_name}</div>
+                          <div className="text-sm text-muted-foreground truncate overflow-hidden whitespace-nowrap">
+                            {user.email_id}
+                          </div>
+                          <div className="flex gap-2 mt-2 text-xs">
+                            <span className="bg-green-300 px-2 py-1 rounded">
+                              {user.user_role}
+                            </span>
+                            <span className="bg-cyan-300 px-2 py-1 rounded">
+                              {user.department_name}
+                            </span>
+                          </div>
+                        </div>,
+                      ]
+                )}
               </div>
+
               {/* )} */}
             </div>
           )}

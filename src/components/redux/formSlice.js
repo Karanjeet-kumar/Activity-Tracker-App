@@ -7,6 +7,7 @@ const formSlice = createSlice({
     selectedCategory: "",
     allActivities: [],
     selectedActivity: "",
+    allDepartments: [],
     allUsers: [],
     assignedUser: "",
     allVerifiers: [],
@@ -27,6 +28,9 @@ const formSlice = createSlice({
     },
     setSelectedActivity: (state, action) => {
       state.selectedActivity = action.payload;
+    },
+    setAllDepartments: (state, action) => {
+      state.allDepartments = action.payload;
     },
     setAllUsers: (state, action) => {
       state.allUsers = action.payload;
@@ -54,6 +58,7 @@ export const {
   setSelectedCategory,
   setAllActivities,
   setSelectedActivity,
+  setAllDepartments,
   setAllUsers,
   setAssignedUser,
   setAllVerifiers,

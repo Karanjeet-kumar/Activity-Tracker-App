@@ -6,6 +6,7 @@ export const REFRESH_TOKEN_API = `${BASE_API_URL}/token/refresh/`;
 export const CATEGORY_API = `${BASE_API_URL}/get/categories/`;
 export const ACTIVITY_API_END_POINT = `${BASE_API_URL}/get/activities`;
 export const USER_API_END_POINT = `${BASE_API_URL}/get/users`;
+export const DEPT_API_END_POINT = `${BASE_API_URL}/get/departments`;
 export const VERIFIER_API_END_POINT = `${BASE_API_URL}/get/verifiers`;
 export const ADD_ACTIVITY_API = `${BASE_API_URL}/add/trnActivity/`;
 export const TRN_ACTIVITY_API_END_POINT = `${BASE_API_URL}/trnActivities`;
