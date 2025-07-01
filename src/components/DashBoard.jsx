@@ -509,11 +509,8 @@ function Dashboard() {
                   </div>
 
                   {statusCounts["New"] > 0 ? (
-                    <div className="text-center py-8">
-                      <MoreInfoButton
-                      // status={selectedCard}
-                      // onClick={() => handleMoreInfo("New")}
-                      />
+                    <div className="text-center py-8 text-gray-500">
+                      Working
                     </div>
                   ) : (
                     <div className="text-center py-8 text-gray-500">
@@ -536,11 +533,8 @@ function Dashboard() {
                   </div>
 
                   {statusCounts["InProgress"] > 0 ? (
-                    <div className="text-center py-8">
-                      <MoreInfoButton
-                      // status={selectedCard}
-                      // onClick={() => handleMoreInfo("New")}
-                      />
+                    <div className="text-center py-8 text-gray-500">
+                      Working
                     </div>
                   ) : (
                     <div className="text-center py-8 text-gray-500">
@@ -561,11 +555,8 @@ function Dashboard() {
                   </div>
 
                   {statusCounts["Completed"] > 0 ? (
-                    <div className="text-center py-8">
-                      <MoreInfoButton
-                      // status={selectedCard}
-                      // onClick={() => handleMoreInfo("New")}
-                      />
+                    <div className="text-center py-8 text-gray-500">
+                      Working
                     </div>
                   ) : (
                     <div className="text-center py-8 text-gray-500">
@@ -586,11 +577,8 @@ function Dashboard() {
                   </div>
 
                   {statusCounts["Rejected"] > 0 ? (
-                    <div className="text-center py-8">
-                      <MoreInfoButton
-                      // status={selectedCard}
-                      // onClick={() => handleMoreInfo("New")}
-                      />
+                    <div className="text-center py-8 text-gray-500">
+                      Working
                     </div>
                   ) : (
                     <div className="text-center py-8 text-gray-500">

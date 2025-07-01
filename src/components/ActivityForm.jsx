@@ -63,7 +63,7 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
     notes,
   } = useSelector((store) => store.form);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  // const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("category");
   const [customActivityName, setCustomActivityName] = useState("");
   // const [customActivityDesc, setCustomActivityDesc] = useState("");
@@ -107,7 +107,7 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
     departmentName
   ) => {
     // API(USERS_API)--->Connected
-    // setLoading(true);
+    setLoading(true);
     try {
       const params = new URLSearchParams();
 
@@ -124,7 +124,7 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
     } catch (error) {
       console.error("Failed to fetch users", error);
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -454,55 +454,160 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                 </div>
               </div>
 
-              {/* {loading ? (
-              <div className="flex items-center justify-center max-h-[300px] h-[300px]">
-                <div className="flex flex-col items-center space-y-3">
-                  <div className="border-4 border-t-4 border-gray-200 border-t-blue-500 rounded-full w-12 h-12 animate-spin"></div>
-                  <p className="text-muted-foreground">Loading users...</p>
+              {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                  {[...Array(6)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="p-4 rounded-lg border border-gray-200"
+                    >
+                      <div className="animate-pulse space-y-3">
+                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        <div className="h-3 bg-gray-300 rounded w-full"></div>
+                        <div className="flex gap-2 mt-2">
+                          <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                          <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-              ) : ( */}
+              ) : (
+                // {/* Search feature without multidept hods */}
+                // {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                //   {allUsers.map((user) => (
+                //     <div
+                //       key={user.user_id}
+                //       className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                //         assignedUser?.user_id === user.user_id
+                //           ? "border-blue-500 bg-blue-100"
+                //           : "hover:border-blue-500 hover:bg-blue-50"
+                //       }`}
+                //       onClick={() => {
+                //         dispatch(setAssignedUser(user));
+                //         handleVerifiers(`${loggedUser.locationId}`);
+                //         setStep("summary");
+                //       }}
+                //     >
+                //       <div className="font-medium">{user.user_name}</div>
+                //       <div className="text-sm text-muted-foreground truncate overflow-hidden whitespace-nowrap">
+                //         {user.email_id}
+                //       </div>
+                //       <div className="flex gap-2 mt-2 text-xs">
+                //         <span className="bg-green-300 px-2 py-1 rounded">
+                //           {user.user_role}
+                //         </span>
+                //         {user.departments.map((dept, index) => (
+                //           <span
+                //             key={index}
+                //             className="bg-cyan-300 px-2 py-1 rounded mr-2"
+                //           >
+                //             {dept.department_name}
+                //           </span>
+                //         ))}
+                //       </div>
+                //     </div>
+                //   ))}
+                // </div> */}
 
-              {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
-                {allUsers.map((user) => (
-                  <div
-                    key={user.user_id}
-                    className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                      assignedUser?.user_id === user.user_id
-                        ? "border-blue-500 bg-blue-100"
-                        : "hover:border-blue-500 hover:bg-blue-50"
-                    }`}
-                    onClick={() => {
-                      dispatch(setAssignedUser(user));
-                      handleVerifiers(`${loggedUser.locationId}`);
-                      setStep("summary");
-                    }}
-                  >
-                    <div className="font-medium">{user.user_name}</div>
-                    <div className="text-sm text-muted-foreground truncate overflow-hidden whitespace-nowrap">
-                      {user.email_id}
-                    </div>
-                    <div className="flex gap-2 mt-2 text-xs">
-                      <span className="bg-green-300 px-2 py-1 rounded">
-                        {user.user_role}
-                      </span>
-                      {user.departments.map((dept, index) => (
-                        <span
-                          key={index}
-                          className="bg-cyan-300 px-2 py-1 rounded mr-2"
-                        >
-                          {dept.department_name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div> */}
+                // {/* Search feature with multidept hods but not proper */}
+                // {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                //   {allUsers.flatMap((user) =>
+                //     user.hod_departments.length > 0
+                //       ? deptFilter
+                //         ? user.hod_departments
+                //         : user.hod_departments.map((dept, index) => (
+                //             <div
+                //               key={`${user.user_id}-${dept.department_id}`}
+                //               className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                //                 assignedUser?.user_id === user.user_id &&
+                //                 assignedUser?.department_id === dept.department_id
+                //                   ? "border-blue-500 bg-blue-100"
+                //                   : "hover:border-blue-500 hover:bg-blue-50"
+                //               }`}
+                //               onClick={() => {
+                //                 dispatch(
+                //                   setAssignedUser({
+                //                     ...user,
+                //                     department_id: dept.department_id,
+                //                     department_name: dept.department_name,
+                //                   })
+                //                 );
+                //                 handleVerifiers(`${loggedUser.locationId}`);
+                //                 setStep("summary");
+                //               }}
+                //             >
+                //               <div className="font-medium">{user.user_name}</div>
+                //               <div className="text-sm text-muted-foreground truncate overflow-hidden whitespace-nowrap">
+                //                 {user.email_id}
+                //               </div>
+                //               <div className="flex gap-2 mt-2 text-xs">
+                //                 <span className="bg-green-300 px-2 py-1 rounded">
+                //                   {user.user_role}
+                //                 </span>
+                //                 <span className="bg-cyan-300 px-2 py-1 rounded">
+                //                   {dept.department_name}
+                //                 </span>
+                //               </div>
+                //             </div>
+                //           ))
+                //       : [
+                //           <div
+                //             key={user.user_id}
+                //             className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                //               assignedUser?.user_id === user.user_id
+                //                 ? "border-blue-500 bg-blue-100"
+                //                 : "hover:border-blue-500 hover:bg-blue-50"
+                //             }`}
+                //             onClick={() => {
+                //               dispatch(
+                //                 setAssignedUser({
+                //                   ...user,
+                //                   department_id: user.departmentId,
+                //                   department_name: user.departmentName,
+                //                 })
+                //               );
+                //               handleVerifiers(`${loggedUser.locationId}`);
+                //               setStep("summary");
+                //             }}
+                //           >
+                //             <div className="font-medium">{user.user_name}</div>
+                //             <div className="text-sm text-muted-foreground truncate overflow-hidden whitespace-nowrap">
+                //               {user.email_id}
+                //             </div>
+                //             <div className="flex gap-2 mt-2 text-xs">
+                //               <span className="bg-green-300 px-2 py-1 rounded">
+                //                 {user.user_role}
+                //               </span>
+                //               <span className="bg-cyan-300 px-2 py-1 rounded">
+                //                 {user.departmentName}
+                //               </span>
+                //             </div>
+                //           </div>,
+                //         ]
+                //   )}
+                // </div> */}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
-                {allUsers.flatMap((user) =>
-                  user.departments.length > 0
-                    ? user.departments.map((dept, index) => (
+                // Finally Search feature with multidept hods
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                  {allUsers.flatMap((user) => {
+                    // Filter HOD departments based on deptFilter if provided
+                    const filteredDepts =
+                      user.hod_departments.length > 0
+                        ? deptFilter
+                          ? user.hod_departments.filter(
+                              (dept) =>
+                                dept.department_name
+                                  .toLowerCase()
+                                  .includes(deptFilter.toLowerCase()) ||
+                                dept.department_id?.toString() === deptFilter
+                            )
+                          : user.hod_departments
+                        : [];
+
+                    // Render blocks for HODs
+                    if (filteredDepts.length > 0) {
+                      return filteredDepts.map((dept) => (
                         <div
                           key={`${user.user_id}-${dept.department_id}`}
                           className={`p-4 rounded-lg border cursor-pointer transition-colors ${
@@ -536,8 +641,19 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                             </span>
                           </div>
                         </div>
-                      ))
-                    : [
+                      ));
+                    }
+
+                    // Render regular (non-HOD) user if they match deptFilter (or no filter)
+                    if (
+                      user.hod_departments.length === 0 &&
+                      (!deptFilter ||
+                        user.departmentName
+                          .toLowerCase()
+                          .includes(deptFilter.toLowerCase()) ||
+                        user.departmentId?.toString() === deptFilter)
+                    ) {
+                      return (
                         <div
                           key={user.user_id}
                           className={`p-4 rounded-lg border cursor-pointer transition-colors ${
@@ -546,7 +662,13 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                               : "hover:border-blue-500 hover:bg-blue-50"
                           }`}
                           onClick={() => {
-                            dispatch(setAssignedUser(user));
+                            dispatch(
+                              setAssignedUser({
+                                ...user,
+                                department_id: user.departmentId,
+                                department_name: user.departmentName,
+                              })
+                            );
                             handleVerifiers(`${loggedUser.locationId}`);
                             setStep("summary");
                           }}
@@ -560,15 +682,17 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                               {user.user_role}
                             </span>
                             <span className="bg-cyan-300 px-2 py-1 rounded">
-                              {user.department_name}
+                              {user.departmentName}
                             </span>
                           </div>
-                        </div>,
-                      ]
-                )}
-              </div>
+                        </div>
+                      );
+                    }
 
-              {/* )} */}
+                    return []; // Don't render anything if no matches
+                  })}
+                </div>
+              )}
             </div>
           )}
 
