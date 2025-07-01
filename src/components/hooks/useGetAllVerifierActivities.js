@@ -14,40 +14,50 @@ export default function useLoadVerifierPage() {
   const { loggedUser } = useSelector((store) => store.auth);
   const userId = loggedUser?.user_id;
 
-  const fetchActivities = useCallback(async () => {
-    if (!loggedUser || loggedUser.isAdmin) return; // Skip if admin or no user
-    if (!userId) return;
+  const fetchActivities = useCallback(
+    async (activityName = "", status = "") => {
+      if (!loggedUser || loggedUser.isAdmin) return; // Skip if admin or no user
+      if (!userId) return;
 
-    let retried = false;
+      let retried = false;
 
-    // API(GetAllVerifierActivities_API)--->Connected
-    try {
-      const accessToken = localStorage.getItem("access_token");
+      // API(GetAllVerifierActivities_API)--->Connected
+      try {
+        const accessToken = localStorage.getItem("access_token");
 
-      if (!accessToken) {
-        toast("Not Authenticated");
-        navigate("/login");
-        return;
+        if (!accessToken) {
+          toast("Not Authenticated");
+          navigate("/login");
+          return;
+        }
+
+        // Prepare query params
+        const queryParams = new URLSearchParams();
+        if (activityName) queryParams.append("activity_name", activityName);
+        if (status !== undefined && status !== null && status !== "") {
+          queryParams.append("status", status);
+        }
+
+        const res = await axios.get(
+          `${VERIFIER_API_END_POINT}/activities/${userId}/?${queryParams.toString()}`
+        );
+
+        if (res.data.success) {
+          dispatch(setAllVerifierActivity(res.data.activities));
+        }
+      } catch (error) {
+        if (error.response?.status === 401 && !retried) {
+          retried = true;
+          const refreshed = await attemptTokenRefresh(navigate);
+          if (refreshed) return fetchActivities(activityName, status);
+        } else {
+          toast("Failed to fetch Verifier Activities");
+          console.error("Fetch error:", error);
+        }
       }
-
-      const res = await axios.get(
-        `${VERIFIER_API_END_POINT}/activities/${userId}/`
-      );
-
-      if (res.data.success) {
-        dispatch(setAllVerifierActivity(res.data.activities));
-      }
-    } catch (error) {
-      if (error.response?.status === 401 && !retried) {
-        retried = true;
-        const refreshed = await attemptTokenRefresh(navigate);
-        if (refreshed) return fetchActivities(); // retry after refresh
-      } else {
-        toast("Failed to fetch Verifier Activities");
-        console.error("Fetch error:", error);
-      }
-    }
-  }, [dispatch, navigate, userId, loggedUser]);
+    },
+    [dispatch, navigate, userId]
+  );
 
   useEffect(() => {
     fetchActivities();

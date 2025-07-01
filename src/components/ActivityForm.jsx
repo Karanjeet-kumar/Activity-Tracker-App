@@ -128,15 +128,23 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
     }
   };
 
-  const handleVerifiers = async (locationId) => {
+  const handleVerifiers = async (locationId, userName) => {
     // API(VERIFIERS_API)--->Connected
+    setLoading(true);
     try {
+      const params = new URLSearchParams();
+
+      if (userName) params.append("user_name", userName);
+
       const response = await axios.get(
-        `${VERIFIER_API_END_POINT}/${locationId}/`
+        // `${VERIFIER_API_END_POINT}/${locationId}/`
+        `${VERIFIER_API_END_POINT}/${locationId}/?${params.toString()}`
       );
       dispatch(setAllVerifiers(response.data.verifiers));
     } catch (error) {
       console.error("Failed to fetch verifiers", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -169,11 +177,14 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
     if (step === "user") {
       handleUsers(`${loggedUser.locationId}`, userRole, searchTerm, deptFilter);
     }
+    if (step === "summary") {
+      handleVerifiers(`${loggedUser.locationId}`, verifierSearch);
+    }
 
     // }, 100); // debounce to avoid too many API calls
 
     // return () => clearTimeout(delayDebounce);
-  }, [userRole, searchTerm, deptFilter]);
+  }, [userRole, searchTerm, deptFilter, verifierSearch]);
 
   const handleCreateActivity = async (formData) => {
     // API(ADD_ACTIVITY_API)--->Connected
@@ -473,8 +484,8 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                   ))}
                 </div>
               ) : (
-                // {/* Search feature without multidept hods */}
-                // {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                //  Search feature without multidept hods
+                // <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
                 //   {allUsers.map((user) => (
                 //     <div
                 //       key={user.user_id}
@@ -508,10 +519,10 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                 //       </div>
                 //     </div>
                 //   ))}
-                // </div> */}
+                // </div>
 
-                // {/* Search feature with multidept hods but not proper */}
-                // {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                //  Search feature with multidept hods but not proper
+                // <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
                 //   {allUsers.flatMap((user) =>
                 //     user.hod_departments.length > 0
                 //       ? deptFilter
@@ -586,7 +597,7 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                 //           </div>,
                 //         ]
                 //   )}
-                // </div> */}
+                // </div>
 
                 // Finally Search feature with multidept hods
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
@@ -747,32 +758,52 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                     onChange={(e) => setVerifierSearch(e.target.value)}
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[200px] overflow-y-auto">
-                  {allVerifiers.map((verifier) => (
-                    <div
-                      key={verifier.user_id}
-                      className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                        assignedVerifier?.user_id === verifier.user_id
-                          ? "border-blue-500 bg-blue-100"
-                          : "hover:border-blue-500 hover:bg-blue-50"
-                      }`}
-                      onClick={() => dispatch(setAssignedVerifier(verifier))}
-                    >
-                      <div className="font-medium">{verifier.user_name}</div>
-                      <div className="text-sm text-muted-foreground truncate overflow-hidden whitespace-nowrap">
-                        {verifier.email_id}
+                {loading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                    {[...Array(3)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="p-4 rounded-lg border border-gray-200"
+                      >
+                        <div className="animate-pulse space-y-3">
+                          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                          <div className="h-3 bg-gray-300 rounded w-full"></div>
+                          <div className="flex gap-2 mt-2">
+                            <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                            <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex gap-2 mt-2 text-xs">
-                        <span className="bg-green-300 px-2 py-1 rounded">
-                          {verifier.user_role}
-                        </span>
-                        <span className="bg-cyan-300 px-2 py-1 rounded">
-                          {verifier.department_name}
-                        </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[200px] overflow-y-auto">
+                    {allVerifiers.map((verifier) => (
+                      <div
+                        key={verifier.user_id}
+                        className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                          assignedVerifier?.user_id === verifier.user_id
+                            ? "border-blue-500 bg-blue-100"
+                            : "hover:border-blue-500 hover:bg-blue-50"
+                        }`}
+                        onClick={() => dispatch(setAssignedVerifier(verifier))}
+                      >
+                        <div className="font-medium">{verifier.user_name}</div>
+                        <div className="text-sm text-muted-foreground truncate overflow-hidden whitespace-nowrap">
+                          {verifier.email_id}
+                        </div>
+                        <div className="flex gap-2 mt-2 text-xs">
+                          <span className="bg-green-300 px-2 py-1 rounded">
+                            {verifier.user_role}
+                          </span>
+                          <span className="bg-cyan-300 px-2 py-1 rounded">
+                            {verifier.department_name}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="space-y-4">

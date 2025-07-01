@@ -19,6 +19,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { Textarea } from "./ui/textarea";
 import ActivityInfo from "./ActivityInfo";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
 function MyReviewPage() {
   const { isNavVisible } = useNav();
@@ -33,6 +34,16 @@ function MyReviewPage() {
 
   // useLoadVerifierPage();
   const { refresh } = useGetAllVerifierActivities();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      refresh(searchTerm, statusFilter); // pass activityName, status left empty
+    }, 500); // adjust debounce time as needed
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, statusFilter, refresh]);
 
   useEffect(() => {
     if (loggedUser) {
@@ -148,7 +159,7 @@ function MyReviewPage() {
                   <div className="flex gap-1">
                     <Button
                       size="sm"
-                      className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer disabled:opacity-0 disabled:cursor-not-allowed"
                       // onClick={() => {
                       //   toast.success("Are you sure you want to verify?", {
                       //     action: {
@@ -184,20 +195,26 @@ function MyReviewPage() {
                           }
                         );
                       }}
-                      disabled={act.task_status === "Verified"}
+                      disabled={
+                        act.task_status === "Verified" ||
+                        act.task_status === "ReOpen"
+                      }
                     >
                       Verify
                     </Button>
                     <Button
                       size="sm"
-                      className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer disabled:opacity-0 disabled:cursor-not-allowed"
                       onClick={() => {
                         setShowReturnComment((prev) =>
                           prev === act.ActivityId ? null : act.ActivityId
                         );
                         setReturnComment("");
                       }}
-                      disabled={act.task_status === "Verified"}
+                      disabled={
+                        act.task_status === "Verified" ||
+                        act.task_status === "ReOpen"
+                      }
                     >
                       {showReturnComment === act.ActivityId
                         ? "✕ Cancel"
@@ -213,11 +230,15 @@ function MyReviewPage() {
                       className={`text-xs px-1.5 py-0.5 rounded border ${
                         act.task_status === "Verified"
                           ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
+                          : act.task_status === "ReOpen"
+                          ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
                           : "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
                       }`}
                     >
                       {act.task_status === "Completed"
                         ? "Pending"
+                        : act.task_status === "ReOpen"
+                        ? "Returned"
                         : act.task_status}
                     </span>
                     <ActivityInfo activity={act} />
@@ -303,6 +324,8 @@ function MyReviewPage() {
                   className={` rounded-2xl flex justify-between text-xs p-2 border ${
                     act.task_status === "Verified"
                       ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 "
+                      : act.task_status === "ReOpen"
+                      ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 "
                       : "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 "
                   }`}
                 >
@@ -393,11 +416,15 @@ function MyReviewPage() {
                     className={`text-xs font-medium px-2.5 py-0.5 rounded border ${
                       act.task_status === "Verified"
                         ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
+                        : act.task_status === "ReOpen"
+                        ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
                         : "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
                     }`}
                   >
                     {act.task_status === "Completed"
                       ? "Pending"
+                      : act.task_status === "ReOpen"
+                      ? "Returned"
                       : act.task_status}
                   </span>
                 </td>
@@ -426,57 +453,72 @@ function MyReviewPage() {
                   {act.AssignedBy}
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer"
-                      onClick={() => {
-                        const toastId = toast.success(
-                          "Are you sure you want to verify?",
-                          {
-                            description: (
-                              <div className="flex justify-end gap-2 mt-2">
-                                <Button
-                                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
-                                  onClick={() => {
-                                    handleVerify(act);
-                                    toast.dismiss(toastId);
-                                  }}
-                                >
-                                  Confirm
-                                </Button>
-                                <Button
-                                  className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
-                                  onClick={() => toast.dismiss(toastId)}
-                                >
-                                  Cancel
-                                </Button>
-                              </div>
-                            ),
-                            duration: 10000,
-                          }
-                        );
-                      }}
-                      disabled={act.task_status === "Verified"}
-                    >
-                      Verify
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer"
-                      onClick={() => {
-                        setShowReturnComment((prev) =>
-                          prev === act.ActivityId ? null : act.ActivityId
-                        );
-                        setReturnComment("");
-                      }}
-                      disabled={act.task_status === "Verified"}
-                    >
-                      {showReturnComment === act.ActivityId
-                        ? "✕ Cancel"
-                        : "Return"}
-                    </Button>
-                  </div>
+                  {act.task_status === "Completed" ? (
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer disabled:opacity-0 disabled:cursor-not-allowed"
+                        onClick={() => {
+                          const toastId = toast.success(
+                            "Are you sure you want to verify?",
+                            {
+                              description: (
+                                <div className="flex justify-end gap-2 mt-2">
+                                  <Button
+                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                    onClick={() => {
+                                      handleVerify(act);
+                                      toast.dismiss(toastId);
+                                    }}
+                                  >
+                                    Confirm
+                                  </Button>
+                                  <Button
+                                    className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                    onClick={() => toast.dismiss(toastId)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              ),
+                              duration: 10000,
+                            }
+                          );
+                        }}
+                        disabled={
+                          act.task_status === "Verified" ||
+                          act.task_status === "ReOpen"
+                        }
+                      >
+                        Verify
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700 cursor-pointer disabled:opacity-0 disabled:cursor-not-allowed"
+                        onClick={() => {
+                          setShowReturnComment((prev) =>
+                            prev === act.ActivityId ? null : act.ActivityId
+                          );
+                          setReturnComment("");
+                        }}
+                        disabled={
+                          act.task_status === "Verified" ||
+                          act.task_status === "ReOpen"
+                        }
+                      >
+                        {showReturnComment === act.ActivityId
+                          ? "✕ Cancel"
+                          : "Return"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      Activity{" "}
+                      {act.task_status === "ReOpen"
+                        ? "Returned"
+                        : act.task_status}
+                    </div>
+                  )}
 
                   {/* Return Comment Section */}
                   {showReturnComment === act.ActivityId && (
@@ -585,6 +627,36 @@ function MyReviewPage() {
             </div>
           </div>
 
+          <div className="mb-6">
+            <Tabs
+              value={statusFilter}
+              onValueChange={(value) => {
+                setStatusFilter(value);
+              }}
+            >
+              <TabsList className="grid grid-cols-3 w-full gap-2 bg-cyan-300">
+                <TabsTrigger
+                  value=""
+                  className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
+                >
+                  Pending
+                </TabsTrigger>
+                <TabsTrigger
+                  value="8"
+                  className="bg-white hover:bg-green-200 data-[state=active]:bg-green-400"
+                >
+                  Verified
+                </TabsTrigger>
+                <TabsTrigger
+                  value="10"
+                  className="bg-white hover:bg-red-200 data-[state=active]:bg-red-400"
+                >
+                  Returned
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
           <div className="mb-2">
             <h1 className="text-lg font-bold">Activities I've To Verify</h1>
           </div>
@@ -595,6 +667,8 @@ function MyReviewPage() {
               <Input
                 placeholder="Search activities..."
                 className="pl-10 py-3 text-md"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
