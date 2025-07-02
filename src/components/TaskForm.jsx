@@ -258,7 +258,7 @@ const TaskForm = ({ task, refresh, search, filter }) => {
                       {user.user_role}
                     </span>
                     <span className="bg-cyan-300 px-2 py-1 rounded">
-                      {user.department_name}
+                      {user.departmentName}
                     </span>
                   </div>
                 </div>

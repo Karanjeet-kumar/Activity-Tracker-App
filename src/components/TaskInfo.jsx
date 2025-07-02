@@ -97,6 +97,8 @@ function TaskInfo({ task }) {
                         ? "bg-orange-100 text-orange-800"
                         : task.Status === "ReOpen"
                         ? "bg-red-100 text-red-800"
+                        : task.Status === "Closed"
+                        ? "bg-gray-100 text-gray-800"
                         : "bg-blue-100 text-blue-800"
                     }`}
                   >

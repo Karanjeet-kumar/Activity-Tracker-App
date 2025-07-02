@@ -291,7 +291,9 @@ function MyTaskPage() {
                   </div>
 
                   {!(
-                    task.Status === "Completed" || task.Status === "Verified"
+                    task.Status === "Completed" ||
+                    task.Status === "Verified" ||
+                    task.Status === "Closed"
                   ) && (
                     <div className="flex gap-1">
                       <Button
@@ -335,6 +337,8 @@ function MyTaskPage() {
                           ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 text-orange-800"
                           : task.Status === "ReOpen"
                           ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
+                          : task.Status === "Closed"
+                          ? "bg-gradient-to-r from-gray-300 to-gray-100 border-gray-800 text-gray-800"
                           : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
                       }`}
                     >
@@ -441,6 +445,8 @@ function MyTaskPage() {
                       ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 "
                       : task.Status === "ReOpen"
                       ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 "
+                      : task.Status === "Closed"
+                      ? "bg-gradient-to-r from-gray-300 to-gray-200 border-gray-800 "
                       : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 "
                   }`}
                 >
@@ -517,9 +523,11 @@ function MyTaskPage() {
                         : task.Status === "InProgress"
                         ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
                         : task.Status === "Verified"
-                        ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 text-yellow-800"
+                        ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 text-orange-800"
                         : task.Status === "ReOpen"
                         ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
+                        : task.Status === "Closed"
+                        ? "bg-gradient-to-r from-gray-300 to-gray-100 border-gray-800 text-gray-800"
                         : "bg-gradient-to-r from-blue-500 to-blue-300 border-blue-800 text-blue-800"
                     }`}
                   >
@@ -549,9 +557,11 @@ function MyTaskPage() {
                   {task.Verifier}
                 </td>
                 {!(
-                  task.Status === "Completed" || task.Status === "Verified"
+                  task.Status === "Completed" ||
+                  task.Status === "Verified" ||
+                  task.Status === "Closed"
                 ) ? (
-                  <td className="px-4 py-4 flex gap-2 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-7 py-4 flex gap-2 whitespace-nowrap text-sm text-gray-500">
                     <Dialog
                       open={showUpdateBox === task.TaskId}
                       onOpenChange={(isOpen) => {
@@ -738,7 +748,7 @@ function MyTaskPage() {
                 setStatusFilter(value);
               }}
             >
-              <TabsList className="grid grid-cols-5 w-full gap-2 bg-cyan-300">
+              <TabsList className="grid grid-cols-6 w-full gap-2 bg-cyan-300">
                 {/* <TabsTrigger
                   value=""
                   className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
@@ -774,6 +784,12 @@ function MyTaskPage() {
                   className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
                 >
                   Verified
+                </TabsTrigger>
+                <TabsTrigger
+                  value="6"
+                  className="bg-white hover:bg-gray-200 data-[state=active]:bg-gray-400"
+                >
+                  Closed
                 </TabsTrigger>
               </TabsList>
             </Tabs>

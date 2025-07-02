@@ -197,7 +197,8 @@ function MyReviewPage() {
                       }}
                       disabled={
                         act.task_status === "Verified" ||
-                        act.task_status === "ReOpen"
+                        act.task_status === "ReOpen" ||
+                        act.task_status === "Closed"
                       }
                     >
                       Verify
@@ -213,7 +214,8 @@ function MyReviewPage() {
                       }}
                       disabled={
                         act.task_status === "Verified" ||
-                        act.task_status === "ReOpen"
+                        act.task_status === "ReOpen" ||
+                        act.task_status === "Closed"
                       }
                     >
                       {showReturnComment === act.ActivityId
@@ -232,6 +234,8 @@ function MyReviewPage() {
                           ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
                           : act.task_status === "ReOpen"
                           ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
+                          : act.task_status === "Closed"
+                          ? "bg-gradient-to-r from-gray-300 to-gray-100 border-gray-800 text-gray-800"
                           : "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
                       }`}
                     >
@@ -326,6 +330,8 @@ function MyReviewPage() {
                       ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 "
                       : act.task_status === "ReOpen"
                       ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 "
+                      : act.task_status === "Closed"
+                      ? "bg-gradient-to-r from-gray-300 to-gray-100 border-gray-800 "
                       : "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 "
                   }`}
                 >
@@ -418,6 +424,8 @@ function MyReviewPage() {
                         ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
                         : act.task_status === "ReOpen"
                         ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
+                        : act.task_status === "Closed"
+                        ? "bg-gradient-to-r from-gray-300 to-gray-300 border-gray-800 text-gray-800"
                         : "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
                     }`}
                   >
@@ -634,7 +642,7 @@ function MyReviewPage() {
                 setStatusFilter(value);
               }}
             >
-              <TabsList className="grid grid-cols-3 w-full gap-2 bg-cyan-300">
+              <TabsList className="grid grid-cols-4 w-full gap-2 bg-cyan-300">
                 <TabsTrigger
                   value=""
                   className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
@@ -652,6 +660,12 @@ function MyReviewPage() {
                   className="bg-white hover:bg-red-200 data-[state=active]:bg-red-400"
                 >
                   Returned
+                </TabsTrigger>
+                <TabsTrigger
+                  value="6"
+                  className="bg-white hover:bg-gray-200 data-[state=active]:bg-gray-400"
+                >
+                  Closed
                 </TabsTrigger>
               </TabsList>
             </Tabs>
