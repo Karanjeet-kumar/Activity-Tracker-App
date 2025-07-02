@@ -746,7 +746,9 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
 
               <div className="space-y-4">
                 <div className="flex gap-8 items-center">
-                  <h3 className="text-lg font-medium">Select Verifier</h3>
+                  <h3 className="text-lg font-medium">
+                    Select Verifier(Optional)
+                  </h3>
                   <p className="text-base text-muted-foreground">
                     {assignedVerifier.user_name}
                   </p>
@@ -839,9 +841,10 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                 <Button
                   className="bg-blue-600 hover:bg-blue-500 cursor-pointer"
                   onClick={() => {
-                    if (assignedVerifier === "") {
-                      toast.error("Select the verifier...");
-                    } else if (!targetDate) {
+                    // if (assignedVerifier === "") {
+                    //   toast.error("Select the verifier...");
+                    // } else
+                    if (!targetDate) {
                       toast.error("Set the target date...");
                     } else {
                       handleCreateActivity(formData);

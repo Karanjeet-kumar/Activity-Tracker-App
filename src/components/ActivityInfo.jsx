@@ -181,6 +181,8 @@ function ActivityInfo({ activity }) {
                               </div>
                             ) : activity.Status === "ForeClose" ? (
                               <div>Rejected Confirm..</div>
+                            ) : activity.Status === "Completed" ? (
+                              <div>Verification Not Required</div>
                             ) : (
                               <div>Not Verified Yet..</div>
                             )}
