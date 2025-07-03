@@ -377,7 +377,7 @@ function ActivityPage() {
                             ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
                             : act.Status === "InProgress"
                             ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
-                            : act.Status === "Rejected"
+                            : act.Status === "Rejected" || "Pending"
                             ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
                             : act.Status === "Closed" ||
                               act.Status === "ForeClose"
@@ -473,7 +473,7 @@ function ActivityPage() {
                       ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800"
                       : act.Status === "InProgress"
                       ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800"
-                      : act.Status === "Rejected"
+                      : act.Status === "Rejected" || "Pending"
                       ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800"
                       : act.Status === "Closed" || act.Status === "ForeClose"
                       ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 "
@@ -591,7 +591,7 @@ function ActivityPage() {
                           ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
                           : act.Status === "InProgress"
                           ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
-                          : act.Status === "Rejected"
+                          : act.Status === "Rejected" || "Pending"
                           ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
                           : act.Status === "Closed" ||
                             act.Status === "ForeClose"
@@ -858,8 +858,8 @@ function ActivityPage() {
             </div>
 
             {/* +++ ADDED VIEW TOGGLE +++ */}
-            <div className="flex items-center gap-3">
-              <div className="flex border rounded-md gap-2 p-1 bg-blue-100">
+            <div className="lg:flex md:flex items-center gap-3">
+              <div className="flex justify-between items-center border rounded-md gap-2 p-1 bg-blue-100">
                 <button
                   onClick={() => setViewMode("card")}
                   className={`p-2 rounded cursor-pointer hover:bg-white ${
@@ -888,7 +888,7 @@ function ActivityPage() {
           </div>
 
           {/* Status Filter Tabs */}
-          {!!loggedUser?.isAdmin && (
+          {/* {!!loggedUser?.isAdmin && (
             <div className="mb-6">
               <Tabs
                 value={statusFilter}
@@ -896,14 +896,7 @@ function ActivityPage() {
                   setStatusFilter(value);
                 }}
               >
-                <TabsList className="grid grid-cols-6 w-full gap-2 bg-cyan-300">
-                  {/* <TabsTrigger
-                    value=""
-                    className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
-                  >
-                    All
-                  </TabsTrigger> */}
-
+                <TabsList className="grid grid-cols-7 w-full gap-2 bg-cyan-300">
                   <TabsTrigger
                     value=""
                     className="bg-white hover:bg-blue-200 data-[state=active]:bg-blue-400"
@@ -915,6 +908,12 @@ function ActivityPage() {
                     className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
                   >
                     In Progress
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="4"
+                    className="bg-white hover:bg-red-200 data-[state=active]:bg-red-400"
+                  >
+                    Verification <span className="text-xs">(Pending)</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="5"
@@ -941,6 +940,120 @@ function ActivityPage() {
                     Rejected <span className="text-xs">(Request)</span>
                   </TabsTrigger>
                 </TabsList>
+              </Tabs>
+            </div>
+          )} */}
+
+          {!!loggedUser?.isAdmin && (
+            <div className="mb-6">
+              <Tabs
+                value={statusFilter}
+                onValueChange={(val) => {
+                  if (val === "6") {
+                    setStatusFilter("6");
+                  } else {
+                    setStatusFilter(val);
+                  }
+                }}
+                className="w-full"
+              >
+                {/* Wrap TabsList inside a div with full bg and padding */}
+                <div className="rounded-lg shadow p-1 w-full">
+                  <TabsList className="w-full">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 w-full">
+                      <TabsTrigger
+                        value=""
+                        className="bg-gray-200 border-2 border-blue-500 text-xs sm:text-sm hover:bg-blue-100 data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                      >
+                        New
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="3"
+                        className="bg-gray-200 border-2 border-yellow-500 text-xs sm:text-sm hover:bg-yellow-100 data-[state=active]:bg-yellow-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                      >
+                        In Progress
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="4"
+                        className="bg-gray-200 border-2 border-red-500 text-xs sm:text-sm hover:bg-red-100 data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                      >
+                        Verification{" "}
+                        <span className="text-[10px] sm:text-xs">
+                          (Pending)
+                        </span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="5"
+                        className="bg-gray-200 border-2 border-green-500 text-xs sm:text-sm hover:bg-green-100 data-[state=active]:bg-green-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                      >
+                        Completed
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="6"
+                        className="bg-gray-200 border-2 border-orange-500 text-xs sm:text-sm hover:bg-orange-100 data-[state=active]:bg-orange-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                      >
+                        Closed / Foreclosed
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="7"
+                        className="bg-gray-200 border-2 border-red-500 text-xs sm:text-sm hover:bg-rose-100 data-[state=active]:bg-rose-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                      >
+                        Rejected{" "}
+                        <span className="text-[10px] sm:text-xs">
+                          (Request)
+                        </span>
+                      </TabsTrigger>
+                    </div>
+                  </TabsList>
+                </div>
+
+                {/* Tab Content */}
+                <div className="mt-10 sm:mt-5 md:mt-4 lg:mt-2 p-4 bg-gradient-to-r from-gray-500 to-gray-300 rounded-md shadow-md">
+                  {statusFilter === "6" || statusFilter === "11" ? (
+                    <Tabs
+                      value={statusFilter}
+                      onValueChange={setStatusFilter}
+                      className="w-full"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-4">
+                        <TabsList className="flex gap-2">
+                          <TabsTrigger
+                            value="6"
+                            className="bg-gray-200 hover:bg-orange-100 data-[state=active]:bg-orange-500 data-[state=active]:text-white rounded-md text-xs sm:text-sm px-4 py-2"
+                          >
+                            Closed
+                          </TabsTrigger>
+                          <TabsTrigger
+                            value="11"
+                            className="bg-gray-200 hover:bg-orange-100 data-[state=active]:bg-orange-500 data-[state=active]:text-white rounded-md text-xs sm:text-sm px-4 py-2"
+                          >
+                            Foreclosed
+                          </TabsTrigger>
+                        </TabsList>
+
+                        <div className="text-xs sm:text-sm text-white">
+                          Showing tasks for:{" "}
+                          <strong>
+                            {statusFilter === "6" ? "Closed" : "Foreclosed"}
+                          </strong>
+                        </div>
+                      </div>
+                    </Tabs>
+                  ) : (
+                    <div className="text-center text-xs sm:text-sm text-white">
+                      Showing tasks for status:{" "}
+                      <strong>
+                        {{
+                          "": "New",
+                          3: "In Progress",
+                          4: "Verification",
+                          5: "Completed",
+                          7: "Rejected",
+                        }[statusFilter] || "Unknown"}
+                      </strong>
+                    </div>
+                  )}
+                </div>
               </Tabs>
             </div>
           )}

@@ -360,7 +360,7 @@ function Dashboard() {
                   </div>
 
                   {delayedActivities.length > 0 ? (
-                    <div className="max-h-40 overflow-y-auto overflow-x-auto">
+                    <div className="max-h-80 overflow-y-auto overflow-x-auto">
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                           <tr>
@@ -434,7 +434,7 @@ function Dashboard() {
                   </div>
 
                   {onTrackActivities.length > 0 ? (
-                    <div className="max-h-40 overflow-y-auto overflow-x-auto">
+                    <div className="max-h-80 overflow-y-auto overflow-x-auto">
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                           <tr>

@@ -235,7 +235,7 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
             onClick={handleCategory}
             className="bg-blue-600 hover:bg-blue-500 cursor-pointer"
           >
-            <SquarePen className="mr-2 h-4 w-4" />
+            <SquarePen className="mr-2 h-4 w-4:" />
             Create Activity
           </Button>
         </DialogTrigger>
