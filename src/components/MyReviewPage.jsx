@@ -641,33 +641,38 @@ function MyReviewPage() {
               onValueChange={(value) => {
                 setStatusFilter(value);
               }}
+              className="w-full"
             >
-              <TabsList className="grid grid-cols-4 w-full gap-2 bg-cyan-300">
-                <TabsTrigger
-                  value=""
-                  className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
-                >
-                  Pending
-                </TabsTrigger>
-                <TabsTrigger
-                  value="8"
-                  className="bg-white hover:bg-green-200 data-[state=active]:bg-green-400"
-                >
-                  Verified
-                </TabsTrigger>
-                <TabsTrigger
-                  value="10"
-                  className="bg-white hover:bg-red-200 data-[state=active]:bg-red-400"
-                >
-                  Returned
-                </TabsTrigger>
-                <TabsTrigger
-                  value="6"
-                  className="bg-white hover:bg-gray-200 data-[state=active]:bg-gray-400"
-                >
-                  Closed
-                </TabsTrigger>
-              </TabsList>
+              <div className="rounded-lg shadow p-1 w-full">
+                <TabsList className="w-full">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 w-full">
+                    <TabsTrigger
+                      value=""
+                      className="bg-gray-200 border-2 border-yellow-500 text-xs sm:text-sm hover:bg-yellow-100 data-[state=active]:bg-yellow-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                    >
+                      Pending
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="8"
+                      className="bg-gray-200 border-2 border-green-500 text-xs sm:text-sm hover:bg-green-100 data-[state=active]:bg-green-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                    >
+                      Verified
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="10"
+                      className="bg-gray-200 border-2 border-red-500 text-xs sm:text-sm hover:bg-red-100 data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                    >
+                      Returned
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="6"
+                      className="bg-gray-200 border-2 border-gray-500 text-xs sm:text-sm hover:bg-gray-300 data-[state=active]:bg-gray-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                    >
+                      Closed
+                    </TabsTrigger>
+                  </div>
+                </TabsList>
+              </div>
             </Tabs>
           </div>
 

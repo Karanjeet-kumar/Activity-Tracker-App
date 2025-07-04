@@ -13,6 +13,7 @@ import {
   CircleFadingPlus,
   CircleGauge,
   Clock4,
+  Info,
   LayoutDashboard,
 } from "lucide-react";
 import { useNav } from "./context/NavContext";
@@ -22,7 +23,7 @@ import {
 } from "./utils/api_const";
 import { useSelector } from "react-redux";
 import ActivityInfo from "./ActivityInfo";
-import useLoadActivityPage from "./hooks/useLoadActivityPage";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const { isNavVisible } = useNav();
@@ -34,7 +35,7 @@ function Dashboard() {
     year: "numeric",
   });
   const { loggedUser } = useSelector((store) => store.auth);
-  // const { refresh } = useLoadActivityPage();
+  const navigate = useNavigate();
 
   const [statusCounts, setStatusCounts] = useState({});
   const [delayedCount, setDelayedCount] = useState(0);
@@ -360,65 +361,67 @@ function Dashboard() {
                   </div>
 
                   {delayedActivities.length > 0 ? (
-                    <div className="max-h-80 overflow-y-auto overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Activity
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Status
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Track
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Target Date
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Delayed Days
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {delayedActivities.map((activity) => (
-                            <tr
-                              key={activity.ActivityId}
-                              className="hover:bg-gray-50"
-                            >
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {activity.ActivityName}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                  {activity.Status}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <ActivityInfo activity={activity} />
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <div className="flex items-center">
-                                  <CalendarClock className="mr-1 h-4 w-4 text-red-500" />
-                                  {new Date(
-                                    activity.TargetDate
-                                  ).toLocaleDateString("en-IN")}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                  {activity.DelayedDays} Days Delay
-                                </span>
-                              </td>
+                    <div className="p-3 rounded-xl bg-red-50 shadow-inner">
+                      <div className="h-75 overflow-y-auto overflow-x-auto ">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Activity
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Track
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Target Date
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Delayed Days
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {delayedActivities.map((activity) => (
+                              <tr
+                                key={activity.ActivityId}
+                                className="hover:bg-gray-50"
+                              >
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                  {activity.ActivityName}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    {activity.Status}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <ActivityInfo activity={activity} />
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  <div className="flex items-center">
+                                    <CalendarClock className="mr-1 h-4 w-4 text-red-500" />
+                                    {new Date(
+                                      activity.TargetDate
+                                    ).toLocaleDateString("en-IN")}
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    {activity.DelayedDays} Days Delay
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <CircleCheckBig className="mx-auto h-12 w-12 text-green-500" />
+                    <div className="h-75 rounded-xl bg-red-50 shadow-inner text-center py-28 text-gray-500">
+                      <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
                       <p className="mt-2">No delayed activities found</p>
                     </div>
                   )}
@@ -434,65 +437,68 @@ function Dashboard() {
                   </div>
 
                   {onTrackActivities.length > 0 ? (
-                    <div className="max-h-80 overflow-y-auto overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Activity
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Status
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Track
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Target Date
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Days Remaining
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {onTrackActivities.map((activity) => (
-                            <tr
-                              key={activity.ActivityId}
-                              className="hover:bg-gray-50"
-                            >
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {activity.ActivityName}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                  {activity.Status}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <ActivityInfo activity={activity} />
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <div className="flex items-center">
-                                  <CalendarClock className="mr-1 h-4 w-4 text-green-500" />
-                                  {new Date(
-                                    activity.TargetDate
-                                  ).toLocaleDateString("en-IN")}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                  {activity.OnTrackDaysRemaining} Days Remaining
-                                </span>
-                              </td>
+                    <div className="p-3 rounded-xl bg-green-50 shadow-inner">
+                      <div className="h-75 overflow-y-auto overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Activity
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Track
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Target Date
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Days Remaining
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {onTrackActivities.map((activity) => (
+                              <tr
+                                key={activity.ActivityId}
+                                className="hover:bg-gray-50"
+                              >
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                  {activity.ActivityName}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    {activity.Status}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <ActivityInfo activity={activity} />
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  <div className="flex items-center">
+                                    <CalendarClock className="mr-1 h-4 w-4 text-green-500" />
+                                    {new Date(
+                                      activity.TargetDate
+                                    ).toLocaleDateString("en-IN")}
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    {activity.OnTrackDaysRemaining} Days
+                                    Remaining
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <CircleCheckBig className="mx-auto h-12 w-12 text-green-500" />
+                    <div className="h-75 rounded-xl bg-green-50 shadow-inner text-center py-28 text-gray-500">
+                      <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
                       <p className="mt-2">No on-track activities found</p>
                     </div>
                   )}
@@ -509,11 +515,14 @@ function Dashboard() {
                   </div>
 
                   {statusCounts["New"] > 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      Working
+                    <div className="h-75 text-center py-8 text-gray-500">
+                      <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow">
+                        <Info size={18} />
+                        More Info
+                      </button>
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="h-75 rounded-xl bg-blue-50 shadow-inner text-center py-28 text-gray-500">
                       <CircleFadingPlus className="mx-auto h-12 w-12 text-blue-500" />
                       <p className="mt-2">No new activities found</p>
                     </div>
@@ -533,13 +542,46 @@ function Dashboard() {
                   </div>
 
                   {statusCounts["InProgress"] > 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      Working
+                    <div className="relative h-75 flex items-center justify-center overflow-hidden rounded-xl bg-yellow-50 shadow-inner">
+                      {/* Semi-visible skeleton grid in background */}
+                      <div className="absolute inset-0 px-4 overflow-hidden blur-[1px] opacity-40 pointer-events-none z-0">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                          {[...Array(9)].map((_, i) => (
+                            <div
+                              key={i}
+                              className="p-4 rounded-lg border border-gray-200 bg-white shadow"
+                            >
+                              <div className="animate-pulse space-y-3">
+                                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                                <div className="h-3 bg-gray-300 rounded w-full"></div>
+                                <div className="flex gap-2 mt-2">
+                                  <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                                  <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Foreground content */}
+                      <div className="relative z-10 flex flex-col items-center justify-center py-8 text-gray-600">
+                        <Clock4 className="h-12 w-12 text-yellow-500 mb-4" />
+                        <button
+                          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-yellow-900 bg-yellow-300 hover:bg-yellow-400 rounded-lg shadow transition cursor-pointer"
+                          onClick={() => {
+                            navigate("/activities?status=3");
+                          }}
+                        >
+                          <Info size={18} />
+                          <span>View In-Progress Activities</span>
+                        </button>
+                      </div>
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="h-75 rounded-xl bg-yellow-50 shadow-inner text-center py-28 text-gray-500">
                       <Clock4 className="mx-auto h-12 w-12 text-yellow-500" />
-                      <p className="mt-2">No InProgreess activities found</p>
+                      <p className="mt-2">No InProgress activities found</p>
                     </div>
                   )}
                 </>
@@ -555,11 +597,44 @@ function Dashboard() {
                   </div>
 
                   {statusCounts["Completed"] > 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      Working
+                    <div className="relative h-75 flex items-center justify-center overflow-hidden rounded-xl bg-green-50 shadow-inner">
+                      {/* Semi-visible skeleton grid in background */}
+                      <div className="absolute inset-0 px-4 overflow-hidden blur-[1px] opacity-40 pointer-events-none z-0">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                          {[...Array(9)].map((_, i) => (
+                            <div
+                              key={i}
+                              className="p-4 rounded-lg border border-gray-200 bg-white shadow"
+                            >
+                              <div className="animate-pulse space-y-3">
+                                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                                <div className="h-3 bg-gray-300 rounded w-full"></div>
+                                <div className="flex gap-2 mt-2">
+                                  <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                                  <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Foreground content */}
+                      <div className="relative z-10 flex flex-col items-center justify-center py-8 text-gray-600">
+                        <CircleCheck className="h-12 w-12 text-green-500 mb-4" />
+                        <button
+                          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-green-900 bg-green-300 hover:bg-green-400 rounded-lg shadow transition cursor-pointer"
+                          onClick={() => {
+                            navigate("/activities?status=5");
+                          }}
+                        >
+                          <Info size={18} />
+                          <span>View Completed Activities</span>
+                        </button>
+                      </div>
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="h-75 rounded-xl bg-green-50 shadow-inner text-center py-28 text-gray-500">
                       <CircleCheck className="mx-auto h-12 w-12 text-green-500" />
                       <p className="mt-2">No Completed activities found</p>
                     </div>
@@ -577,11 +652,44 @@ function Dashboard() {
                   </div>
 
                   {statusCounts["Rejected"] > 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      Working
+                    <div className="relative h-75 flex items-center justify-center overflow-hidden rounded-xl bg-red-50 shadow-inner">
+                      {/* Semi-visible skeleton grid in background */}
+                      <div className="absolute inset-0 px-4 overflow-hidden blur-[1px] opacity-40 pointer-events-none z-0">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                          {[...Array(9)].map((_, i) => (
+                            <div
+                              key={i}
+                              className="p-4 rounded-lg border border-gray-200 bg-white shadow"
+                            >
+                              <div className="animate-pulse space-y-3">
+                                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                                <div className="h-3 bg-gray-300 rounded w-full"></div>
+                                <div className="flex gap-2 mt-2">
+                                  <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                                  <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Foreground content */}
+                      <div className="relative z-10 flex flex-col items-center justify-center py-8 text-gray-600">
+                        <CircleAlert className="h-12 w-12 text-red-500 mb-4" />
+                        <button
+                          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-900 bg-red-300 hover:bg-red-400 rounded-lg shadow transition cursor-pointer"
+                          onClick={() => {
+                            navigate("/activities?status=7");
+                          }}
+                        >
+                          <Info size={18} />
+                          <span>View Pending Activities</span>
+                        </button>
+                      </div>
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="h-75 rounded-xl bg-red-50 shadow-inner text-center py-28 text-gray-500">
                       <CircleAlert className="mx-auto h-12 w-12 text-red-500" />
                       <p className="mt-2">No Pending activities found</p>
                     </div>

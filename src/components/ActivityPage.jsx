@@ -22,6 +22,7 @@ import { Textarea } from "./ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useNav } from "./context/NavContext";
 import ActivityInfo from "./ActivityInfo";
+import { useLocation } from "react-router-dom";
 
 function ActivityPage() {
   const { isNavVisible } = useNav();
@@ -40,6 +41,18 @@ function ActivityPage() {
   const { refresh } = useLoadActivityPage();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+
+  // Dashboard link logic
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const incomingStatus = queryParams.get("status"); // "3", if provided in URL
+
+  useEffect(() => {
+    // set status from URL only once on mount
+    if (incomingStatus) {
+      setStatusFilter(incomingStatus);
+    }
+  }, [incomingStatus]);
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {

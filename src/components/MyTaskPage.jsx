@@ -747,51 +747,50 @@ function MyTaskPage() {
               onValueChange={(value) => {
                 setStatusFilter(value);
               }}
+              className="w-full"
             >
-              <TabsList className="grid grid-cols-6 w-full gap-2 bg-cyan-300">
-                {/* <TabsTrigger
-                  value=""
-                  className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
-                >
-                  All
-                </TabsTrigger> */}
-                <TabsTrigger
-                  value=""
-                  className="bg-white hover:bg-blue-200 data-[state=active]:bg-blue-400"
-                >
-                  Open
-                </TabsTrigger>
-                <TabsTrigger
-                  value="3"
-                  className="bg-white hover:bg-yellow-200 data-[state=active]:bg-yellow-400"
-                >
-                  In Progress
-                </TabsTrigger>
-                <TabsTrigger
-                  value="10"
-                  className="bg-white hover:bg-red-200 data-[state=active]:bg-red-400"
-                >
-                  ReOpen
-                </TabsTrigger>
-                <TabsTrigger
-                  value="5"
-                  className="bg-white hover:bg-green-200 data-[state=active]:bg-green-400"
-                >
-                  Completed
-                </TabsTrigger>
-                <TabsTrigger
-                  value="8"
-                  className="bg-white hover:bg-orange-200 data-[state=active]:bg-orange-400"
-                >
-                  Verified
-                </TabsTrigger>
-                <TabsTrigger
-                  value="6"
-                  className="bg-white hover:bg-gray-200 data-[state=active]:bg-gray-400"
-                >
-                  Closed
-                </TabsTrigger>
-              </TabsList>
+              <div className="rounded-lg shadow p-1 w-full">
+                <TabsList className="w-full">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 w-full">
+                    <TabsTrigger
+                      value=""
+                      className="bg-gray-200 border-2 border-blue-500 text-xs sm:text-sm hover:bg-blue-100 data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                    >
+                      Open
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="3"
+                      className="bg-gray-200 border-2 border-yellow-500 text-xs sm:text-sm hover:bg-yellow-100 data-[state=active]:bg-yellow-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                    >
+                      In Progress
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="10"
+                      className="bg-gray-200 border-2 border-red-500 text-xs sm:text-sm hover:bg-red-100 data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                    >
+                      ReOpen
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="5"
+                      className="bg-gray-200 border-2 border-green-500 text-xs sm:text-sm hover:bg-green-100 data-[state=active]:bg-green-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                    >
+                      Completed
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="8"
+                      className="bg-gray-200 border-2 border-orange-500 text-xs sm:text-sm hover:bg-orange-100 data-[state=active]:bg-orange-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                    >
+                      Verified
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="6"
+                      className="bg-gray-200 border-2 border-gray-500 text-xs sm:text-sm hover:bg-gray-300 data-[state=active]:bg-gray-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                    >
+                      Closed
+                    </TabsTrigger>
+                  </div>
+                </TabsList>
+              </div>
             </Tabs>
           </div>
 
