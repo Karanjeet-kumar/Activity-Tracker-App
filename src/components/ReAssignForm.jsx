@@ -428,7 +428,9 @@ function ReAssignForm({ activity, refresh, statusFilter, setStatusFilter }) {
                   value={
                     assignedVerifier.user_name
                       ? `${assignedVerifier.user_name}`
-                      : `${activity.Verifier}`
+                      : activity.Verifier 
+                      ? `${activity.Verifier}` 
+                      : "Not Selected"
                   }
                   icon={<ShieldCheck size={18} />}
                   onClick={() => setActiveStep("verifier")}
