@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useNav } from "./context/NavContext";
 import ActivityInfo from "./ActivityInfo";
 import { useLocation } from "react-router-dom";
+import ReAssignForm from "./ReAssignForm";
 
 function ActivityPage() {
   const { isNavVisible } = useNav();
@@ -258,7 +259,14 @@ function ActivityPage() {
                   </div>
 
                   {loggedUser.isAdmin ? (
-                    act.Status === "Completed" ? (
+                    act.Status === "New" || act.Status === "InProgress" ? (
+                      <ReAssignForm
+                        activity={act}
+                        refresh={refresh}
+                        statusFilter={statusFilter}
+                        setStatusFilter={setStatusFilter}
+                      />
+                    ) : act.Status === "Completed" ? (
                       <Button
                         size="sm"
                         className="h-7 px-2 text-xs bg-gradient-to-r from-green-800 to-green-400 cursor-pointer"
@@ -293,39 +301,47 @@ function ActivityPage() {
                         Close Activity
                       </Button>
                     ) : act.Status === "Rejected" ? (
-                      <Button
-                        size="sm"
-                        className="h-7 px-2 text-xs bg-gradient-to-r from-green-800 to-green-400 cursor-pointer"
-                        onClick={() => {
-                          const toastId = toast.success(
-                            "Are you sure you want to confirm & close this activity?",
-                            {
-                              description: (
-                                <div className="flex justify-end gap-2 mt-2">
-                                  <Button
-                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
-                                    onClick={() => {
-                                      handleForeClose(act);
-                                      toast.dismiss(toastId);
-                                    }}
-                                  >
-                                    Confirm
-                                  </Button>
-                                  <Button
-                                    className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
-                                    onClick={() => toast.dismiss(toastId)}
-                                  >
-                                    Cancel
-                                  </Button>
-                                </div>
-                              ),
-                              duration: 10000,
-                            }
-                          );
-                        }}
-                      >
-                        Confirm Reject
-                      </Button>
+                      <div className="flex gap-2">
+                        <ReAssignForm
+                          activity={act}
+                          refresh={refresh}
+                          statusFilter={statusFilter}
+                          setStatusFilter={setStatusFilter}
+                        />
+                        <Button
+                          size="sm"
+                          className="h-7 px-2 text-xs bg-gradient-to-r from-green-800 to-green-400 cursor-pointer"
+                          onClick={() => {
+                            const toastId = toast.success(
+                              "Are you sure you want to confirm & close this activity?",
+                              {
+                                description: (
+                                  <div className="flex justify-end gap-2 mt-2">
+                                    <Button
+                                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                      onClick={() => {
+                                        handleForeClose(act);
+                                        toast.dismiss(toastId);
+                                      }}
+                                    >
+                                      Confirm
+                                    </Button>
+                                    <Button
+                                      className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                      onClick={() => toast.dismiss(toastId)}
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </div>
+                                ),
+                                duration: 10000,
+                              }
+                            );
+                          }}
+                        >
+                          Confirm Reject
+                        </Button>
+                      </div>
                     ) : null
                   ) : (
                     <div className="flex gap-1">
@@ -390,7 +406,8 @@ function ActivityPage() {
                             ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
                             : act.Status === "InProgress"
                             ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
-                            : act.Status === "Rejected" || "Pending"
+                            : act.Status === "Rejected" ||
+                              act.Status === "Pending"
                             ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
                             : act.Status === "Closed" ||
                               act.Status === "ForeClose"
@@ -486,7 +503,7 @@ function ActivityPage() {
                       ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800"
                       : act.Status === "InProgress"
                       ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800"
-                      : act.Status === "Rejected" || "Pending"
+                      : act.Status === "Rejected" || act.Status === "Pending"
                       ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800"
                       : act.Status === "Closed" || act.Status === "ForeClose"
                       ? "bg-gradient-to-r from-orange-500 to-orange-300 border-orange-800 "
@@ -604,7 +621,8 @@ function ActivityPage() {
                           ? "bg-gradient-to-r from-green-500 to-green-300 border-green-800 text-green-800"
                           : act.Status === "InProgress"
                           ? "bg-gradient-to-r from-yellow-500 to-yellow-300 border-yellow-800 text-yellow-800"
-                          : act.Status === "Rejected" || "Pending"
+                          : act.Status === "Rejected" ||
+                            act.Status === "Pending"
                           ? "bg-gradient-to-r from-red-500 to-red-300 border-red-800 text-red-800"
                           : act.Status === "Closed" ||
                             act.Status === "ForeClose"
@@ -649,7 +667,16 @@ function ActivityPage() {
                   {act.Verifier}
                 </td>
                 {loggedUser.isAdmin ? (
-                  act.Status === "Completed" ? (
+                  act.Status === "New" || act.Status === "InProgress" ? (
+                    <td className="px-7 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <ReAssignForm
+                        activity={act}
+                        refresh={refresh}
+                        statusFilter={statusFilter}
+                        setStatusFilter={setStatusFilter}
+                      />
+                    </td>
+                  ) : act.Status === "Completed" ? (
                     <td className="px-7 py-4 whitespace-nowrap text-sm text-gray-500">
                       <Button
                         size="sm"
@@ -687,39 +714,47 @@ function ActivityPage() {
                     </td>
                   ) : act.Status === "Rejected" ? (
                     <td className="px-7 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <Button
-                        size="sm"
-                        className="h-7 px-2 text-xs bg-gradient-to-r from-green-800 to-green-400 cursor-pointer"
-                        onClick={() => {
-                          const toastId = toast.success(
-                            "Are you sure you want to confirm & close this activity?",
-                            {
-                              description: (
-                                <div className="flex justify-end gap-2 mt-2">
-                                  <Button
-                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
-                                    onClick={() => {
-                                      handleForeClose(act);
-                                      toast.dismiss(toastId);
-                                    }}
-                                  >
-                                    Confirm
-                                  </Button>
-                                  <Button
-                                    className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
-                                    onClick={() => toast.dismiss(toastId)}
-                                  >
-                                    Cancel
-                                  </Button>
-                                </div>
-                              ),
-                              duration: 10000,
-                            }
-                          );
-                        }}
-                      >
-                        Confirm Reject
-                      </Button>
+                      <div className="flex gap-2">
+                        <ReAssignForm
+                          activity={act}
+                          refresh={refresh}
+                          statusFilter={statusFilter}
+                          setStatusFilter={setStatusFilter}
+                        />
+                        <Button
+                          size="sm"
+                          className="h-7 px-2 text-xs bg-gradient-to-r from-green-800 to-green-400 cursor-pointer"
+                          onClick={() => {
+                            const toastId = toast.success(
+                              "Are you sure you want to confirm & close this activity?",
+                              {
+                                description: (
+                                  <div className="flex justify-end gap-2 mt-2">
+                                    <Button
+                                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded cursor-pointer"
+                                      onClick={() => {
+                                        handleForeClose(act);
+                                        toast.dismiss(toastId);
+                                      }}
+                                    >
+                                      Confirm
+                                    </Button>
+                                    <Button
+                                      className="border px-3 py-1 text-sm rounded bg-gray-400 hover:bg-gray-600 cursor-pointer"
+                                      onClick={() => toast.dismiss(toastId)}
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </div>
+                                ),
+                                duration: 10000,
+                              }
+                            );
+                          }}
+                        >
+                          Confirm Reject
+                        </Button>
+                      </div>
                     </td>
                   ) : (
                     <td className="px-7 py-4 whitespace-nowrap text-sm text-gray-500">

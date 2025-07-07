@@ -515,11 +515,41 @@ function Dashboard() {
                   </div>
 
                   {statusCounts["New"] > 0 ? (
-                    <div className="h-75 text-center py-8 text-gray-500">
-                      <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow">
-                        <Info size={18} />
-                        More Info
-                      </button>
+                    <div className="relative h-75 flex items-center justify-center overflow-hidden rounded-xl bg-blue-50 shadow-inner">
+                      {/* Semi-visible skeleton grid in background */}
+                      <div className="absolute inset-0 px-4 overflow-hidden blur-[1px] opacity-40 pointer-events-none z-0">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto">
+                          {[...Array(9)].map((_, i) => (
+                            <div
+                              key={i}
+                              className="p-4 rounded-lg border border-gray-200 bg-white shadow"
+                            >
+                              <div className="animate-pulse space-y-3">
+                                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                                <div className="h-3 bg-gray-300 rounded w-full"></div>
+                                <div className="flex gap-2 mt-2">
+                                  <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                                  <div className="h-4 bg-gray-300 rounded w-1/3"></div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Foreground content */}
+                      <div className="relative z-10 flex flex-col items-center justify-center py-8 text-gray-600">
+                        <Clock4 className="h-12 w-12 text-blue-500 mb-4" />
+                        <button
+                          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-blue-900 bg-blue-300 hover:bg-blue-400 rounded-lg shadow transition cursor-pointer"
+                          onClick={() => {
+                            navigate("/activities");
+                          }}
+                        >
+                          <Info size={18} />
+                          <span>View New Activities</span>
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="h-75 rounded-xl bg-blue-50 shadow-inner text-center py-28 text-gray-500">

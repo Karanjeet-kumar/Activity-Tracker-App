@@ -605,7 +605,7 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                     // Filter HOD departments based on deptFilter if provided
                     const filteredDepts =
                       user.hod_departments.length > 0
-                        ? deptFilter
+                        ? deptFilter != "all"
                           ? user.hod_departments.filter(
                               (dept) =>
                                 dept.department_name
@@ -659,6 +659,7 @@ function ActivityForm({ onActivityCreated, statusFilter, setStatusFilter }) {
                     if (
                       user.hod_departments.length === 0 &&
                       (!deptFilter ||
+                        deptFilter === "all" ||
                         user.departmentName
                           .toLowerCase()
                           .includes(deptFilter.toLowerCase()) ||

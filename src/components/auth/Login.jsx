@@ -187,7 +187,7 @@ const Login = () => {
   }, [loggedUser, navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-blue-50 to-cyan-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-200 via-blue-500 to-blue-200 flex items-center justify-center p-4">
       <div className="flex flex-col md:flex-row w-full max-w-4xl min-h-[450px] bg-white rounded-2xl shadow-xl overflow-hidden">
         {/* Left side - Image with Logo */}
         <div className="w-full md:w-1/2 relative overflow-hidden">
