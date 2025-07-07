@@ -214,34 +214,42 @@ function ReAssignForm({ activity, refresh, statusFilter, setStatusFilter }) {
     }
   }, [allVerifiers, isDialogOpen, activity]);
 
-  const handleEditActivity = async (formData, act) => {
+  const handleEditActivity = async (formData, activity) => {
     try {
-      // API(CLOSE_ACTIVITY_API)--->Connected
-      await axios.put(
-        `${TRN_ACTIVITY_API_END_POINT}/close/${act.ActivityId}/`,
-        {
-          status: 11,
-          ClosedOn: new Date(
-            new Date().getTime() - new Date().getTimezoneOffset() * 60000
-          )
-            .toISOString()
-            .slice(0, -1),
-        }
-      );
-      toast.success("Reassigning Initiated");
+      const data = {};
 
-      // API(ADD_ACTIVITY_API)--->Connected
-      const res = await axios.post(`${ADD_ACTIVITY_API}`, formData);
-
-      if (res.data.success) {
-        toast.success("Activity Reassigned Successfully.");
-        if (refresh) await refresh();
-        setStatusFilter("");
-      } else {
-        toast.error("Reassignment Failed");
+      // Include assigned user only if selected
+      if (
+        assignedUser?.user_id !== undefined &&
+        assignedUser?.user_id !== null
+      ) {
+        data.assignedUserId = assignedUser.user_id;
       }
+
+      // Include verifier only if selected
+      if (
+        assignedVerifier?.user_id !== undefined &&
+        assignedVerifier?.user_id !== null
+      ) {
+        data.Verifier_Id = assignedVerifier.user_id;
+      }
+
+      // Include target date only if it's picked
+      if (targetDate) {
+        data.TargetDate = targetDate;
+      }
+
+      await axios.put(
+        `${TRN_ACTIVITY_API_END_POINT}/edit/${activity.ActivityId}/`,
+        data
+      );
+
+      if (refresh) await refresh();
+      setStatusFilter(statusFilter);
+      toast.success("Activity Updated Successfully");
     } catch (error) {
-      toast.error("Reassignment Failed");
+      console.error(error);
+      toast.error("Failed to update activity.");
     } finally {
       setIsDialogOpen(false);
     }
@@ -310,13 +318,27 @@ function ReAssignForm({ activity, refresh, statusFilter, setStatusFilter }) {
             </p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          onClick={onClick}
-          className="border-blue-500 text-blue-600 hover:bg-blue-50 cursor-pointer"
-        >
-          {buttonText}
-        </Button>
+        {statusFilter === "7" ? (
+          <Button
+            variant="outline"
+            onClick={onClick}
+            className="border-blue-500 text-blue-600 hover:bg-blue-50 cursor-pointer"
+          >
+            {buttonText}
+          </Button>
+        ) : (
+          <>
+            {title === "Verifier" && (
+              <Button
+                variant="outline"
+                onClick={onClick}
+                className="border-blue-500 text-blue-600 hover:bg-blue-50 cursor-pointer"
+              >
+                {buttonText}
+              </Button>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
@@ -420,7 +442,8 @@ function ReAssignForm({ activity, refresh, statusFilter, setStatusFilter }) {
                   }
                   icon={<User size={18} />}
                   onClick={() => setActiveStep("user")}
-                  buttonText={"Change User"}
+                  // buttonText={"Change User"}
+                  buttonText={statusFilter === "7" ? "Change User" : undefined}
                 />
 
                 <SummaryCard
@@ -428,8 +451,8 @@ function ReAssignForm({ activity, refresh, statusFilter, setStatusFilter }) {
                   value={
                     assignedVerifier.user_name
                       ? `${assignedVerifier.user_name}`
-                      : activity.Verifier 
-                      ? `${activity.Verifier}` 
+                      : activity.Verifier
+                      ? `${activity.Verifier}`
                       : "Not Selected"
                   }
                   icon={<ShieldCheck size={18} />}
@@ -494,7 +517,7 @@ function ReAssignForm({ activity, refresh, statusFilter, setStatusFilter }) {
                   <Button
                     className="bg-gradient-to-r from-blue-700 to-blue-500 hover:from-blue-600 hover:to-blue-400 shadow-md cursor-pointer"
                     onClick={() => {
-                      //   handleEditActivity(formData, activity);
+                      handleEditActivity(formData, activity);
                     }}
                     disabled={
                       !assignedUser.user_id &&
