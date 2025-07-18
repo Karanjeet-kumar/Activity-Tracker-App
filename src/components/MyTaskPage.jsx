@@ -49,6 +49,7 @@ function MyTaskPage() {
 
   // +++ ADDED VIEW STATE +++
   const [viewMode, setViewMode] = useState("card"); // 'card' or 'list'
+  const [subtaskFilter, setSubtaskFilter] = useState("all"); // Subtask filter state
 
   // UseLoadTaskPage();
   const { refresh } = useGetAllAssignedTasks();
@@ -68,6 +69,11 @@ function MyTaskPage() {
       setLoading(false);
     }
   }, [loggedUser]);
+
+  // Reset subtask filter when status changes
+  useEffect(() => {
+    setSubtaskFilter("all");
+  }, [statusFilter]);
 
   if (loading || !loggedUser) {
     return (
@@ -113,7 +119,34 @@ function MyTaskPage() {
   };
 
   const renderTasks = () => {
-    if (allAssignedTask?.length === 0) {
+    // Filter tasks based on subtask status
+    let filteredTasks = allAssignedTask || [];
+
+    if (statusFilter === "3" && subtaskFilter !== "all") {
+      filteredTasks = filteredTasks.filter((task) => {
+        // Completed: all subtasks completed
+        if (subtaskFilter === "completed") {
+          return (
+            task.SubTaskStatuses.length > 0 &&
+            task.SubTaskStatuses.every((status) => status === "Completed")
+          );
+        }
+        // Running: subtasks exist but not all completed
+        if (subtaskFilter === "running") {
+          return (
+            task.SubTaskStatuses.length > 0 &&
+            !task.SubTaskStatuses.every((status) => status === "Completed")
+          );
+        }
+        // None: no subtasks
+        if (subtaskFilter === "none") {
+          return task.SubTaskStatuses.length === 0;
+        }
+        return true;
+      });
+    }
+
+    if (filteredTasks.length === 0) {
       return (
         <div>
           {/* No Activities Section */}
@@ -125,7 +158,7 @@ function MyTaskPage() {
               No tasks found
             </h3>
             <p className="text-gray-500 text-center max-w-md">
-              You don't have any tasks yet
+              You don't have any tasks matching your filters
             </p>
           </div>
         </div>
@@ -134,150 +167,9 @@ function MyTaskPage() {
 
     // Card View
     if (viewMode === "card") {
-      // return (
-      //   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3">
-      //     {allAssignedTask.map((task) => (
-      //       <Card key={task.TaskId}>
-      //         <CardHeader>
-      //           <div>
-      //             <div className="flex justify-between items-start">
-      //               <div>
-      //                 <CardTitle className="text-xl">
-      //                   {task.TaskDescription}
-      //                 </CardTitle>
-      //                 {/* <p className="text-sm text-gray-500">
-      //                 {task.TaskDescription}
-      //               </p> */}
-      //               </div>
-
-      //               <div className="flex gap-2">
-      //                 <Button
-      //                   className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded cursor-pointer"
-      //                   onClick={() => {
-      //                     setShowUpdateBox((prev) =>
-      //                       prev === task.TaskId ? null : task.TaskId
-      //                     );
-      //                     setRemarks("");
-      //                     setTaskFilter("all");
-      //                   }}
-      //                 >
-      //                   {showUpdateBox === task.TaskId ? "Cancel" : "Update"}
-      //                 </Button>
-      //                 {!!loggedUser?.isHOD && <TaskForm task={task} />}
-      //               </div>
-      //             </div>
-
-      //             {/* Update Box Section */}
-      //             {showUpdateBox === task.TaskId && (
-      //               <div className="mt-1 p-2 bg-white rounded-lg shadow-md border border-gray-300">
-      //                 <div className="space-y-4">
-      //                   {/* Task Status Dropdown */}
-      //                   <div>
-      //                     <Select
-      //                       onValueChange={setTaskFilter}
-      //                       value={taskFilter}
-      //                     >
-      //                       <SelectTrigger className="w-full p-2 rounded-lg shadow-md border border-gray-300">
-      //                         <SelectValue placeholder="Select Status" />
-      //                       </SelectTrigger>
-      //                       <SelectContent>
-      //                         <SelectItem value="all">
-      //                           Select Status...
-      //                         </SelectItem>
-      //                         <SelectItem value="3">In Progress</SelectItem>
-      //                         <SelectItem value="5">Completed</SelectItem>
-      //                       </SelectContent>
-      //                     </Select>
-      //                   </div>
-
-      //                   {/* Remarks Textarea */}
-      //                   <div>
-      //                     <Textarea
-      //                       value={remarks}
-      //                       onChange={(e) => setRemarks(e.target.value)}
-      //                       placeholder="Enter your remarks here..."
-      //                       className="w-full p-2 min-h-[80px]"
-      //                     />
-      //                   </div>
-
-      //                   {/* Confirm Button */}
-      //                   <div className="flex justify-end pt-2">
-      //                     <Button
-      //                       className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded cursor-pointer"
-      //                       onClick={() => {
-      //                         if (taskFilter === "all") {
-      //                           toast.error("Select task status...");
-      //                         } else {
-      //                           handleUpdate(task);
-      //                           setRemarks("");
-      //                           setShowUpdateBox(null);
-      //                         }
-      //                       }}
-      //                     >
-      //                       Confirm Update
-      //                     </Button>
-      //                   </div>
-      //                 </div>
-      //               </div>
-      //             )}
-      //           </div>
-      //         </CardHeader>
-
-      //         <CardContent className="space-y-5">
-      //           <div className="flex justify-between items-center">
-      //             <div className="flex items-center space-x-2">
-      //               <p>Status</p>
-      //               <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">
-      //                 {task.Status}
-      //               </span>
-      //             </div>
-
-      //             <div className="text-sm">
-      //               <p>Due Date</p>
-      //               <div className="flex items-center text-sm text-gray-600">
-      //                 <CalendarDays className="h-4 w-4 mr-1" />
-      //                 <span>{task.TargetDate}</span>
-      //               </div>
-      //             </div>
-      //           </div>
-
-      //           <div className="flex justify-between items-center">
-      //             <div>
-      //               <p className="text-sm font-semibold text-gray-800 mb-1">
-      //                 Description
-      //               </p>
-      //               <p className="text-sm text-gray-700">{task.Remarks}</p>
-      //             </div>
-
-      //             <div className="text-sm">
-      //               <p>Assigned Date</p>
-      //               <div className="flex items-center text-sm text-gray-600">
-      //                 <CalendarDays className="h-4 w-4 mr-1" />
-      //                 <span>{task.AssignedOn}</span>
-      //               </div>
-      //             </div>
-      //           </div>
-
-      //           <div className="flex justify-between items-center pt-2 border-t">
-      //             <div>
-      //               <p className="text-xs text-gray-500">Assigned By</p>
-      //               <p className="text-sm text-gray-800">{task.CreatedBy}</p>
-      //             </div>
-
-      //             <div>
-      //               <p className="text-xs text-gray-500">Verifier</p>
-      //               <p className="text-sm text-gray-800">{task.Verifier}</p>
-      //             </div>
-      //           </div>
-      //         </CardContent>
-      //       </Card>
-      //     ))}
-      //   </div>
-      // );
-
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {allAssignedTask.map((task) => (
+          {filteredTasks.map((task) => (
             <div
               key={task.TaskId}
               className="border-2 border-blue-200 border-l-8 rounded-4xl shadow-md hover:shadow-2xl transition-shadow"
@@ -306,9 +198,6 @@ function MyTaskPage() {
                           setRemarks("");
                           setTaskFilter("all");
                         }}
-                        // disabled={["Completed", "Verified"].includes(
-                        //   task.Status
-                        // )}
                       >
                         {showUpdateBox === task.TaskId ? "✕ Cancel" : "Update"}
                       </Button>
@@ -510,7 +399,7 @@ function MyTaskPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {allAssignedTask.map((task) => (
+            {filteredTasks.map((task) => (
               <tr key={task.TaskId} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {task.TaskDescription}
@@ -577,9 +466,6 @@ function MyTaskPage() {
                             setRemarks("");
                             setTaskFilter("all");
                           }}
-                          // disabled={["Completed", "Verified"].includes(
-                          //   task.Status
-                          // )}
                         >
                           Update
                         </Button>
@@ -797,8 +683,55 @@ function MyTaskPage() {
           <div className="mb-2">
             <h1 className="text-lg font-bold">Tasks I've Assigned</h1>
           </div>
+
+          {/* Subtask Filter Tabs - Only shown when statusFilter is "3" */}
+          {statusFilter === "3" && !!loggedUser.isHOD && (
+            <div className="flex justify-content items-center justify-around gap-3 mb-6 mt-14 sm:mt-14 md:mt-0 lg:mt-0">
+              <div>
+                <h1 className="text-lg font-semibold">Apply filter</h1>
+              </div>
+              <div>
+                <Tabs
+                  value={subtaskFilter}
+                  onValueChange={setSubtaskFilter}
+                  className="w-full"
+                >
+                  <div className="rounded-lg shadow p-1 w-full">
+                    <TabsList className="w-full">
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4  gap-2 w-full">
+                        <TabsTrigger
+                          value="all"
+                          className="line-clamp-2 bg-gray-200 border-2 border-yellow-500 text-xs hover:bg-yellow-100 data-[state=active]:bg-yellow-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                        >
+                          All InProgress Tasks
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="completed"
+                          className="line-clamp-2 bg-gray-200 border-2 border-green-500 text-xs hover:bg-green-100 data-[state=active]:bg-green-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                        >
+                          Task with subtask completed
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="running"
+                          className="line-clamp-2 bg-gray-200 border-2 border-yellow-500 text-xs hover:bg-yellow-100 data-[state=active]:bg-yellow-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                        >
+                          Task with subtasks running
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="none"
+                          className="line-clamp-2 bg-gray-200 border-2 border-blue-500 text-xs hover:bg-blue-100 data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                        >
+                          Task with no subtask
+                        </TabsTrigger>
+                      </div>
+                    </TabsList>
+                  </div>
+                </Tabs>
+              </div>
+            </div>
+          )}
+
           <div className="mb-3 flex items-center">
-            {/* <Input placeholder="Search your tasks..." className="max-w-6xl" /> */}
             <div className="relative w-full max-w-6xl">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
