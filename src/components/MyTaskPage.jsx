@@ -122,7 +122,10 @@ function MyTaskPage() {
     // Filter tasks based on subtask status
     let filteredTasks = allAssignedTask || [];
 
-    if (statusFilter === "3" && subtaskFilter !== "all") {
+    if (
+      (statusFilter === "3" || statusFilter === "" || statusFilter === "10") &&
+      subtaskFilter !== "all"
+    ) {
       filteredTasks = filteredTasks.filter((task) => {
         // Completed: all subtasks completed
         if (subtaskFilter === "completed") {
@@ -685,51 +688,70 @@ function MyTaskPage() {
           </div>
 
           {/* Subtask Filter Tabs - Only shown when statusFilter is "3" */}
-          {statusFilter === "3" && !!loggedUser.isHOD && (
-            <div className="flex justify-content items-center justify-around gap-3 mb-6 mt-14 sm:mt-14 md:mt-0 lg:mt-0">
-              <div>
-                <h1 className="text-lg font-semibold">Apply filter</h1>
+          {(statusFilter === "3" ||
+            statusFilter === "" ||
+            statusFilter === "10") &&
+            !!loggedUser.isHOD && (
+              <div className="flex justify-content items-center justify-around gap-3 mb-6 mt-14 sm:mt-14 md:mt-0 lg:mt-0">
+                <div>
+                  <h1 className="text-lg font-semibold">Apply filter</h1>
+                </div>
+                <div>
+                  <Tabs
+                    value={subtaskFilter}
+                    onValueChange={setSubtaskFilter}
+                    className="w-full"
+                  >
+                    <div className="rounded-lg shadow p-1 w-full">
+                      <TabsList className="w-full">
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4  gap-2 w-full">
+                          {statusFilter === "" ? (
+                            <TabsTrigger
+                              value="all"
+                              className="line-clamp-2 bg-gray-200 border-2 border-blue-500 text-xs hover:bg-blue-100 data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                            >
+                              All Open Tasks
+                            </TabsTrigger>
+                          ) : statusFilter === "3" ? (
+                            <TabsTrigger
+                              value="all"
+                              className="line-clamp-2 bg-gray-200 border-2 border-yellow-500 text-xs hover:bg-yellow-100 data-[state=active]:bg-yellow-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                            >
+                              All InProgress Tasks
+                            </TabsTrigger>
+                          ) : (
+                            <TabsTrigger
+                              value="all"
+                              className="line-clamp-2 bg-gray-200 border-2 border-red-500 text-xs hover:bg-red-100 data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                            >
+                              All ReOpen Tasks
+                            </TabsTrigger>
+                          )}
+                          <TabsTrigger
+                            value="completed"
+                            className="line-clamp-2 bg-gray-200 border-2 border-green-500 text-xs hover:bg-green-100 data-[state=active]:bg-green-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                          >
+                            Task with subtask completed
+                          </TabsTrigger>
+                          <TabsTrigger
+                            value="running"
+                            className="line-clamp-2 bg-gray-200 border-2 border-yellow-500 text-xs hover:bg-yellow-100 data-[state=active]:bg-yellow-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                          >
+                            Task with subtasks running
+                          </TabsTrigger>
+                          <TabsTrigger
+                            value="none"
+                            className="line-clamp-2 bg-gray-200 border-2 border-gray-500 text-xs hover:bg-gray-100 data-[state=active]:bg-gray-500 data-[state=active]:text-white rounded-md py-2 w-full"
+                          >
+                            Task with no subtask
+                          </TabsTrigger>
+                        </div>
+                      </TabsList>
+                    </div>
+                  </Tabs>
+                </div>
               </div>
-              <div>
-                <Tabs
-                  value={subtaskFilter}
-                  onValueChange={setSubtaskFilter}
-                  className="w-full"
-                >
-                  <div className="rounded-lg shadow p-1 w-full">
-                    <TabsList className="w-full">
-                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4  gap-2 w-full">
-                        <TabsTrigger
-                          value="all"
-                          className="line-clamp-2 bg-gray-200 border-2 border-yellow-500 text-xs hover:bg-yellow-100 data-[state=active]:bg-yellow-500 data-[state=active]:text-white rounded-md py-2 w-full"
-                        >
-                          All InProgress Tasks
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="completed"
-                          className="line-clamp-2 bg-gray-200 border-2 border-green-500 text-xs hover:bg-green-100 data-[state=active]:bg-green-500 data-[state=active]:text-white rounded-md py-2 w-full"
-                        >
-                          Task with subtask completed
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="running"
-                          className="line-clamp-2 bg-gray-200 border-2 border-yellow-500 text-xs hover:bg-yellow-100 data-[state=active]:bg-yellow-500 data-[state=active]:text-white rounded-md py-2 w-full"
-                        >
-                          Task with subtasks running
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="none"
-                          className="line-clamp-2 bg-gray-200 border-2 border-blue-500 text-xs hover:bg-blue-100 data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-md py-2 w-full"
-                        >
-                          Task with no subtask
-                        </TabsTrigger>
-                      </div>
-                    </TabsList>
-                  </div>
-                </Tabs>
-              </div>
-            </div>
-          )}
+            )}
 
           <div className="mb-3 flex items-center">
             <div className="relative w-full max-w-6xl">
